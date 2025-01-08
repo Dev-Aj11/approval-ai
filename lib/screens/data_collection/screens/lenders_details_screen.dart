@@ -1,5 +1,5 @@
 import 'package:approval_ai/screens/data_collection/model/user_options.dart';
-import 'package:approval_ai/screens/data_collection/widgets/custom_app_bar.dart';
+import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_check_box.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
 import 'package:approval_ai/screens/data_collection/widgets/step_indicator.dart';
@@ -17,7 +17,12 @@ class LendersDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+        buttons: [
+          ButtonConfig(label: "Cancel", onPress: () {}),
+          ButtonConfig(label: "Save & Exit", onPress: () {}),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.fromLTRB(64.0, 72, 64, 72),

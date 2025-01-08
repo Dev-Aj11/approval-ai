@@ -1,4 +1,3 @@
-import 'package:approval_ai/screens/data_collection/screens/user_details_screen.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_drop_down.dart';
 import 'package:approval_ai/widgets/custom_button_with_icon.dart';
 import 'package:approval_ai/widgets/custom_field_heading.dart';
@@ -6,7 +5,7 @@ import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
 import '../widgets/step_indicator.dart';
-import '../widgets/custom_app_bar.dart';
+import '../../../widgets/custom_app_bar.dart';
 
 class LoanDetailsScreen extends StatelessWidget {
   const LoanDetailsScreen({super.key});
@@ -14,7 +13,12 @@ class LoanDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+        buttons: [
+          ButtonConfig(label: "Cancel", onPress: () {}),
+          ButtonConfig(label: "Save & Exit", onPress: () {}),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.fromLTRB(64.0, 72, 64, 72),

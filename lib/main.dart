@@ -3,7 +3,7 @@ import 'package:approval_ai/screens/authentication/screens/reset_successful_scre
 import 'package:approval_ai/screens/authentication/screens/sign_up_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/login_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/verify_email_screen.dart';
-import 'package:approval_ai/screens/dashboard/screens/home_screen.dart';
+import 'package:approval_ai/screens/home/screens/home_screen.dart';
 import 'package:approval_ai/screens/data_collection/screens/lenders_details_screen.dart';
 import 'package:approval_ai/screens/data_collection/screens/loan_details_screen.dart';
 import 'package:approval_ai/screens/data_collection/screens/user_details_screen.dart';
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: GoogleFonts.inter().fontFamily, // set default font
       ),
-      initialRoute: '/overview',
+      initialRoute: '/home',
       routes: {
         // '/': (context) => const AuthGate(), // need to figure out how to work with AuthGate
         '/signup': (context) => const SignUpScreen(),

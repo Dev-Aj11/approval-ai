@@ -3,7 +3,7 @@ import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/widgets/custom_text_field.dart';
 import '../widgets/step_indicator.dart';
-import '../widgets/custom_app_bar.dart';
+import '../../../widgets/custom_app_bar.dart';
 
 class UserDetailsScreen extends StatelessWidget {
   const UserDetailsScreen({super.key});
@@ -11,7 +11,12 @@ class UserDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+        buttons: [
+          ButtonConfig(label: "Cancel", onPress: () {}),
+          ButtonConfig(label: "Save & Exit", onPress: () {}),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.fromLTRB(64.0, 72, 64, 72),

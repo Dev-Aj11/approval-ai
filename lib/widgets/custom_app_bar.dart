@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+class ButtonConfig {
+  final String label;
+  final VoidCallback onPress; // specific type alias for void Function()
+
+  ButtonConfig({required this.label, required this.onPress});
+}
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
+  final List<ButtonConfig> buttons;
+
+  const CustomAppBar({required this.buttons, super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(60);
@@ -40,21 +49,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
+        actions: List.generate(
+          buttons.length,
+          (index) => TextButton(
+            onPressed: buttons[index].onPress,
             child: Text(
-              'Cancel',
+              buttons[index].label,
               style: TextStyle(color: Colors.black),
             ),
           ),
-          TextButton(
-            onPressed: () {
-              // Handle save and exit
-            },
-            child: Text('Save & Exit', style: TextStyle(color: Colors.black)),
-          ),
-        ],
+        ),
       ),
     );
   }
