@@ -3,11 +3,9 @@ import 'package:approval_ai/screens/authentication/screens/reset_successful_scre
 import 'package:approval_ai/screens/authentication/screens/sign_up_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/login_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/verify_email_screen.dart';
+import 'package:approval_ai/screens/data_collection/screens/data_collection_screen.dart';
 import 'package:approval_ai/screens/home/screens/home_screen.dart';
-import 'package:approval_ai/screens/data_collection/screens/lenders_details_screen.dart';
-import 'package:approval_ai/screens/data_collection/screens/loan_details_screen.dart';
-import 'package:approval_ai/screens/data_collection/screens/user_details_screen.dart';
-import 'package:approval_ai/screens/data_collection/screens/verification_details_screen.dart';
+import 'package:approval_ai/screens/home/screens/zero_state_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,10 +42,8 @@ class MyApp extends StatelessWidget {
         '/resetsuccessful': (context) => const ResetSuccessfulScreen(),
         '/home': (context) => HomeScreen(),
         '/verifyemail': (context) => VerifyEmailScreen(),
-        '/overview': (context) => UserDetailsScreen(),
-        '/loandetails': (context) => LoanDetailsScreen(),
-        '/lenders': (context) => LendersDetailsScreen(),
-        '/verification': (context) => VerificationDetailsScreen()
+        '/zerostatehome': (context) => ZeroStateHomeScreen(),
+        '/datacollection': (context) => DataCollectionScreen(),
       },
     );
   }

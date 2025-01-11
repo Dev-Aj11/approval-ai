@@ -4,47 +4,10 @@ import 'package:approval_ai/widgets/custom_field_heading.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
-import '../widgets/step_indicator.dart';
-import '../../../widgets/custom_app_bar.dart';
-
-class LoanDetailsScreen extends StatelessWidget {
-  const LoanDetailsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        buttons: [
-          ButtonConfig(label: "Cancel", onPress: () {}),
-          ButtonConfig(label: "Save & Exit", onPress: () {}),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(64.0, 72, 64, 72),
-          child: Center(
-            child: SizedBox(
-              width: 590,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  StepIndicator(currentStep: 1),
-                  SizedBox(height: 43),
-                  CustomHeading(label: "Select your \npreferred loan type"),
-                  SizedBox(height: 40.0),
-                  LoanTypeDetailsForm(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class LoanTypeDetailsForm extends StatefulWidget {
-  const LoanTypeDetailsForm({super.key});
+  final VoidCallback onComplete;
+  const LoanTypeDetailsForm({required this.onComplete, super.key});
 
   @override
   State<LoanTypeDetailsForm> createState() => _LoanTypeDetailsFormState();
@@ -69,18 +32,24 @@ class _LoanTypeDetailsFormState extends State<LoanTypeDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInterestRateSection(),
-          SizedBox(height: 32),
-          _buildTermLengthSection(),
-          SizedBox(height: 48),
-          PrimaryCta(label: "Next", onPressCb: () => onPressNext(context)),
-        ],
-      ),
+    return Column(
+      children: [
+        CustomHeading(label: "Select your \npreferred loan type"),
+        SizedBox(height: 40.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInterestRateSection(),
+              SizedBox(height: 32),
+              _buildTermLengthSection(),
+              SizedBox(height: 48),
+              PrimaryCta(label: "Next", onPressCb: () => onPressNext(context)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -105,8 +74,8 @@ class _LoanTypeDetailsFormState extends State<LoanTypeDetailsForm> {
   }
 
   void onPressNext(context) {
-    // should run validator
-    Navigator.pushReplacementNamed(context, '/lenders');
+    // save to firebase - loanTermSelected and fixedSelected
+    widget.onComplete();
   }
 
   Widget _buildInterestRateSection() {

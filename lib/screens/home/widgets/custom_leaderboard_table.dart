@@ -2,7 +2,6 @@ import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_lender_button.dart';
 import 'package:approval_ai/screens/home/widgets/custom_overview_card.dart';
 import 'package:approval_ai/screens/home/widgets/styles.dart';
-import 'package:approval_ai/widgets/custom_button_with_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,6 +25,8 @@ class CustomLeaderboardTable extends StatelessWidget {
         totalPayments: "\$65,000"),
     // ... other rankings
   ];
+
+  CustomLeaderboardTable({super.key});
 
   @override
   Widget build(BuildContext context) {

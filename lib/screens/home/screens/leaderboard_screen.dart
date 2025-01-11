@@ -1,5 +1,4 @@
 import 'package:approval_ai/screens/home/widgets/cusotm_leaderboard_header.dart';
-import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
 import 'package:approval_ai/screens/home/widgets/custom_leaderboard_table.dart';
 import 'package:flutter/material.dart';
 

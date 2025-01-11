@@ -1,7 +1,6 @@
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../model/overview_data.dart';
 
 class CustomSubHeading extends StatelessWidget {
   final String label;

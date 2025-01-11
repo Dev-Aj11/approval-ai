@@ -15,6 +15,5 @@ class CustomHeading extends StatelessWidget {
       ),
       textAlign: TextAlign.center,
     );
-    ;
   }
 }

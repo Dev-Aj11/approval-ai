@@ -1,62 +1,13 @@
 import 'package:approval_ai/screens/data_collection/model/user_options.dart';
-import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_check_box.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
-import 'package:approval_ai/screens/data_collection/widgets/step_indicator.dart';
 import 'package:approval_ai/widgets/custom_field_heading.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 
-class LendersDetailsScreen extends StatelessWidget {
-  const LendersDetailsScreen({super.key});
-
-  void onPressNext(context) {
-    Navigator.pushReplacementNamed(context, '/verification');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        buttons: [
-          ButtonConfig(label: "Cancel", onPress: () {}),
-          ButtonConfig(label: "Save & Exit", onPress: () {}),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(64.0, 72, 64, 72),
-          child: Center(
-            child: SizedBox(
-              width: 590,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StepIndicator(currentStep: 2),
-                  SizedBox(height: 43),
-                  Center(
-                      child: CustomHeading(
-                          label: "Select your\npreferred lenders")),
-                  SizedBox(height: 40.0),
-                  LenderDetailsForm(),
-                  SizedBox(height: 24),
-                  PrimaryCta(
-                    label: "Next",
-                    smallSize: true,
-                    onPressCb: () => onPressNext(context),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class LenderDetailsForm extends StatefulWidget {
-  const LenderDetailsForm({super.key});
+  final VoidCallback onComplete;
+  const LenderDetailsForm({required this.onComplete, super.key});
 
   @override
   State<LenderDetailsForm> createState() => _LenderDetailsFormState();
@@ -81,8 +32,13 @@ class _LenderDetailsFormState extends State<LenderDetailsForm> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
+  _buildFormHeader() {
+    return Center(
+      child: CustomHeading(label: "Select your\npreferred lenders"),
+    );
+  }
+
+  _buildLenderOptions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -107,19 +63,31 @@ class _LenderDetailsFormState extends State<LenderDetailsForm> {
               ),
             ),
           ),
-        )
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCTA() {
+    return PrimaryCta(
+      label: "Next",
+      smallSize: true,
+      onPressCb: widget.onComplete,
+      isEnabled: isChecked.contains(true),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFormHeader(),
+        SizedBox(height: 40.0),
+        _buildLenderOptions(),
+        SizedBox(height: 40),
+        _buildCTA(),
       ],
     );
   }
 }
-
-
-/*
-        CustomCheckBox(
-          heading: "Retail Banks",
-          subHeading:
-              "Big Banks like Chase, Wells Fargo that provide lots of loan options ",
-          isChecked: isChecked,
-          onCheck: onCheck,
-        )
-        */

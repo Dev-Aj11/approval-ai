@@ -1,20 +1,26 @@
 import 'package:approval_ai/widgets/custom_field_heading.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'dart:math' show min;
 
 class CustomTextField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
   final FocusNode focusNode; // not sure why this is needed?
   final bool obscureText;
+  final bool digitsOnly;
+  final bool textOnly;
+  final bool isMoney;
   final String? prefix;
   final Widget? suffixIcon;
   final String? hint;
   final TextInputType? keyboardType;
+  final Function(String)? onChanged;
   final String? Function(String?)? validator;
 
   const CustomTextField({
-    Key? key,
     required this.label,
     required this.controller,
     required this.focusNode,
@@ -23,8 +29,13 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType,
     this.validator,
     this.hint,
+    this.onChanged,
     this.obscureText = false,
-  }) : super(key: key);
+    this.digitsOnly = false,
+    this.textOnly = false,
+    this.isMoney = false,
+    super.key,
+  });
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -33,6 +44,11 @@ class CustomTextField extends StatefulWidget {
 class _CustomTextFieldState extends State<CustomTextField> {
   // change style when text field is focused
   bool isFocused = false;
+  final _moneyFormatter = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: '', // Empty because we're using prefixText
+    decimalDigits: 0,
+  );
 
   @override
   void initState() {
@@ -65,17 +81,57 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return CustomFieldHeading(label: widget.label);
   }
 
+  List<TextInputFormatter> _buildInputFormatter() {
+    if (widget.digitsOnly || widget.isMoney) {
+      return [FilteringTextInputFormatter.digitsOnly];
+    }
+    if (widget.textOnly) {
+      return [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))];
+    }
+    return [];
+  }
+
   Widget _buildTextField(context) {
     return TextFormField(
       focusNode: widget.focusNode,
+      inputFormatters: _buildInputFormatter(),
       controller: widget.controller,
       obscureText: widget.obscureText,
       validator: widget.validator,
-      keyboardType: widget.keyboardType,
+      keyboardType: widget.isMoney
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : widget.keyboardType,
       cursorColor: Colors.black,
       decoration: _getInputDecoration(context),
       style: _getTextStyle(),
+      onChanged: widget.onChanged ?? (widget.isMoney ? _formatMoney : null),
     );
+  }
+
+  void _formatMoney(String value) {
+    if (value.isEmpty) return;
+
+    try {
+      // Remove any existing commas first
+      String cleanValue = value.replaceAll(',', '');
+
+      // Parse to integer
+      int? amount = int.tryParse(cleanValue);
+      if (amount != null) {
+        // Format with commas
+        String formatted = _moneyFormatter.format(amount);
+
+        // Only update if the value is different
+        if (formatted != widget.controller.text) {
+          widget.controller.value = TextEditingValue(
+            text: formatted,
+            selection: TextSelection.collapsed(offset: formatted.length),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error formatting money: $e');
+    }
   }
 
   InputDecoration _getInputDecoration(BuildContext context) {
