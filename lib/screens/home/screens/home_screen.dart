@@ -1,4 +1,6 @@
 import 'package:approval_ai/screens/home/model/overview_data.dart';
+import 'package:approval_ai/screens/home/screens/leaderboard_screen.dart';
+import 'package:approval_ai/screens/home/widgets/custom_leaderboard_table.dart';
 import 'package:approval_ai/screens/home/widgets/custom_lender_card.dart';
 import 'package:approval_ai/screens/home/widgets/custom_overview_card.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
@@ -45,6 +47,10 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 50),
                 _buildOverviewStats(),
                 SizedBox(height: 56),
+                _buildLeaderboard(),
+                SizedBox(
+                  height: 56,
+                ),
                 _buildLenderDetails(),
               ],
             ),
@@ -83,6 +89,10 @@ class HomeScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildLeaderboard() {
+    return LeaderboardScreen();
   }
 
   Widget _buildLenderDetails() {

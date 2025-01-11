@@ -34,23 +34,20 @@ class CustomLenderCard extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            _buildLenderInfo(),
-            CustomLenderExpansionTile(details: LenderDetails.messagesExchagned),
-            CustomLenderExpansionTile(details: LenderDetails.estimateAnalysis),
-            CustomLenderExpansionTile(
-                details: LenderDetails.negotiationAnalysis)
-          ],
-        ),
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _buildLenderTitleRow(),
+          CustomLenderExpansionTile(details: LenderDetails.messagesExchagned),
+          CustomLenderExpansionTile(details: LenderDetails.estimateAnalysis),
+          CustomLenderExpansionTile(details: LenderDetails.negotiationAnalysis)
+        ],
       ),
     );
   }
 
-  _buildLenderInfo() {
+  _buildLenderTitleRow() {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
@@ -109,17 +106,5 @@ class CustomLenderCard extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  _buildMessagesExchanged() {
-    return CustomLenderExpansionTile(details: LenderDetails.messagesExchagned);
-  }
-
-  _buildLoanEstAnalysis() {
-    return Placeholder();
-  }
-
-  _buildNegotiationAnalysis() {
-    return Placeholder();
   }
 }

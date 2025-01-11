@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CustomLenderButton extends StatelessWidget {
+class CustomExpansionTileButtons extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onPress;
 
-  const CustomLenderButton({
+  const CustomExpansionTileButtons({
     required this.label,
     required this.icon,
     required this.onPress,
@@ -64,7 +64,7 @@ class CustomLenderButton extends StatelessWidget {
         children: [
           Text(label, style: _getTextStyle()),
           const SizedBox(width: 6),
-          Icon(icon, size: 24, color: Colors.black),
+          Icon(icon, size: 20, color: Colors.black),
         ],
       ),
     );
