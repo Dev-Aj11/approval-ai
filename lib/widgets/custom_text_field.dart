@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'dart:math' show min;
 
 class CustomTextField extends StatefulWidget {
   final String label;
@@ -86,7 +85,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       return [FilteringTextInputFormatter.digitsOnly];
     }
     if (widget.textOnly) {
-      return [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]'))];
+      return [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))];
     }
     return [];
   }

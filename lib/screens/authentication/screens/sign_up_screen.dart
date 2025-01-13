@@ -86,12 +86,12 @@ class _SignUpFormState extends State<SignUpForm> {
       // navigate to the verify email screen
       Navigator.pushReplacementNamed(context, '/verifyemail');
     } on FirebaseAuthException catch (e) {
-      String errorMessage = '';
-      if (e.code == 'email-already-in-use') {
-        errorMessage = 'Account already exists';
-      } else if (e.code == 'invalid-email') {
-        errorMessage = 'Invalid email address';
-      }
+      // String errorMessage = '';
+      // if (e.code == 'email-already-in-use') {
+      //   errorMessage = 'Account already exists';
+      // } else if (e.code == 'invalid-email') {
+      //   errorMessage = 'Invalid email address';
+      // }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.code.toString())),
       );

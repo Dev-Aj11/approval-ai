@@ -1,3 +1,4 @@
+import 'package:approval_ai/screens/data_collection/model/user_data_model.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_drop_down.dart';
 import 'package:approval_ai/widgets/custom_button_with_icon.dart';
 import 'package:approval_ai/widgets/custom_field_heading.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
 
 class LoanTypeDetailsForm extends StatefulWidget {
-  final VoidCallback onComplete;
+  final Function(LoanPreference) onComplete;
   const LoanTypeDetailsForm({required this.onComplete, super.key});
 
   @override
@@ -75,7 +76,11 @@ class _LoanTypeDetailsFormState extends State<LoanTypeDetailsForm> {
 
   void onPressNext(context) {
     // save to firebase - loanTermSelected and fixedSelected
-    widget.onComplete();
+    String loanType = fixedSelected ? "fixed" : "arm";
+    int loanTerm = int.parse(loanTermSelected.split(" ")[0]);
+    LoanPreference loanPreference =
+        LoanPreference(type: loanType, term: loanTerm);
+    widget.onComplete(loanPreference);
   }
 
   Widget _buildInterestRateSection() {

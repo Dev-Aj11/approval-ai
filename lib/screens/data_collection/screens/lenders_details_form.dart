@@ -1,3 +1,4 @@
+import 'package:approval_ai/screens/data_collection/model/user_data_model.dart';
 import 'package:approval_ai/screens/data_collection/model/user_options.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_check_box.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
@@ -6,7 +7,7 @@ import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 
 class LenderDetailsForm extends StatefulWidget {
-  final VoidCallback onComplete;
+  final Function(LenderPreference) onComplete;
   const LenderDetailsForm({required this.onComplete, super.key});
 
   @override
@@ -69,10 +70,16 @@ class _LenderDetailsFormState extends State<LenderDetailsForm> {
   }
 
   Widget _buildCTA() {
+    LenderPreference lenderPreference = LenderPreference(
+      selectAll: isChecked[0],
+      retail: isChecked[1],
+      wholesale: isChecked[2],
+      creditUnions: isChecked[3],
+    );
     return PrimaryCta(
       label: "Next",
       smallSize: true,
-      onPressCb: widget.onComplete,
+      onPressCb: () => widget.onComplete(lenderPreference),
       isEnabled: isChecked.contains(true),
     );
   }

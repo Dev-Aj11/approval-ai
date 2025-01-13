@@ -1,10 +1,12 @@
+import 'package:approval_ai/screens/data_collection/model/user_data_model.dart';
+import 'package:approval_ai/screens/data_collection/widgets/address_text_field.dart';
 import 'package:approval_ai/screens/data_collection/widgets/custom_heading.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/widgets/custom_text_field.dart';
 
 class UserDataForm extends StatefulWidget {
-  final VoidCallback onComplete;
+  final Function(UserData) onComplete;
   const UserDataForm({required this.onComplete, super.key});
 
   @override
@@ -17,13 +19,15 @@ class _UserDataFormState extends State<UserDataForm> {
   // ensuring Flutter can track and manage its state correctly.
   // 3) It helps Flutter maintain the form's state during widget rebuilds and when navigating between screen.
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _grossIncomeController = TextEditingController();
   final _ssnController = TextEditingController();
   final _addressController = TextEditingController();
   final _purchasePriceController = TextEditingController();
   final _loanAmtController = TextEditingController();
-  final _fullNameNode = FocusNode();
+  final _firstNameNode = FocusNode();
+  final _lastNameNode = FocusNode();
   final _grossIncomeNode = FocusNode();
   final _ssnNode = FocusNode();
   final _addressNode = FocusNode();
@@ -32,7 +36,8 @@ class _UserDataFormState extends State<UserDataForm> {
 
   @override
   void dispose() {
-    _fullNameNode.dispose();
+    _firstNameNode.dispose();
+    _lastNameNode.dispose();
     _grossIncomeNode.dispose();
     _ssnNode.dispose();
     _addressNode.dispose();
@@ -43,8 +48,17 @@ class _UserDataFormState extends State<UserDataForm> {
 
   void onNextBtnPress(context) {
     if (_formKey.currentState?.validate() == true) {
-      // save to firebase and then proceed to next step
-      widget.onComplete();
+      final userData = UserData(
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        grossIncome: int.parse(_grossIncomeController.text.replaceAll(",", "")),
+        ssn: int.parse(_ssnController.text.replaceAll(",", "")),
+        address: _addressController.text,
+        loanAmount: int.parse(_loanAmtController.text.replaceAll(",", "")),
+        purchasePrice:
+            int.parse(_purchasePriceController.text.replaceAll(",", "")),
+      );
+      widget.onComplete(userData);
     }
   }
 
@@ -112,9 +126,17 @@ class _UserDataFormState extends State<UserDataForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField(
-                label: 'Your full name',
-                controller: _fullNameController,
-                focusNode: _fullNameNode,
+                label: 'Your first name',
+                controller: _firstNameController,
+                focusNode: _firstNameNode,
+                textOnly: true,
+                validator: (value) => validateName(value),
+              ),
+              SizedBox(height: 32.0),
+              CustomTextField(
+                label: 'Your last name',
+                controller: _lastNameController,
+                focusNode: _lastNameNode,
                 textOnly: true,
                 validator: (value) => validateName(value),
               ),
@@ -138,11 +160,14 @@ class _UserDataFormState extends State<UserDataForm> {
                 validator: (value) => validateSSN(value),
               ),
               SizedBox(height: 32.0),
-              CustomTextField(
+              AddressTextField(
                 label: 'Property Address',
                 controller: _addressController,
                 focusNode: _addressNode,
                 validator: (value) => validateAddress(value),
+                onAddressSelected: (addressData) {
+                  print("Parent received address: ${addressData['address']}");
+                },
               ),
               SizedBox(height: 32.0),
               CustomTextField(

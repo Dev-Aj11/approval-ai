@@ -6,7 +6,7 @@ import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 
 class VerificationDetailsForm extends StatefulWidget {
-  final VoidCallback onComplete;
+  final Function(bool) onComplete;
   const VerificationDetailsForm({required this.onComplete, super.key});
 
   @override
@@ -63,7 +63,7 @@ class _VerificationDetailsFormState extends State<VerificationDetailsForm> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: PrimaryCta(
         label: "Submit",
-        onPressCb: widget.onComplete,
+        onPressCb: () => widget.onComplete(true),
         smallSize: true,
         isEnabled: !isChecked.contains(false),
       ),

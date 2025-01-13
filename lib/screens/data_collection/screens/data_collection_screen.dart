@@ -1,3 +1,5 @@
+import 'package:approval_ai/firebase_functions.dart';
+import 'package:approval_ai/screens/data_collection/model/user_data_model.dart';
 import 'package:approval_ai/screens/data_collection/screens/lenders_details_form.dart';
 import 'package:approval_ai/screens/data_collection/screens/loan_type_details_form.dart';
 import 'package:approval_ai/screens/data_collection/screens/user_data_form.dart';
@@ -15,17 +17,26 @@ class DataCollectionScreen extends StatefulWidget {
 
 class _DataCollectionScreenState extends State<DataCollectionScreen> {
   int currentStep = 0;
+  var userInfoAndPreferences = {};
 
   Widget _buildCustomForm() {
     switch (currentStep) {
       case 0:
-        return UserDataForm(onComplete: updateStep);
+        return UserDataForm(
+            onComplete: (UserData userData) => onUserDataComplete(userData));
       case 1:
-        return LoanTypeDetailsForm(onComplete: updateStep);
+        return LoanTypeDetailsForm(
+            onComplete: (LoanPreference loanData) =>
+                onLoanTypeComplete(loanData));
       case 2:
-        return LenderDetailsForm(onComplete: updateStep);
+        return LenderDetailsForm(
+          onComplete: (LenderPreference lenderData) =>
+              onLenderTypeComplete(lenderData),
+        );
       case 3:
-        return VerificationDetailsForm(onComplete: updateStep);
+        return VerificationDetailsForm(
+            onComplete: (acceptedTerms) =>
+                onVerificationComplete(acceptedTerms));
       default:
         return Placeholder();
     }
@@ -34,8 +45,12 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   PreferredSizeWidget _buildCustomAppBar() {
     return CustomAppBar(
       buttons: [
-        ButtonConfig(label: "Cancel", onPress: () {}),
-        ButtonConfig(label: "Save & Exit", onPress: () {}),
+        ButtonConfig(
+          label: "Cancel",
+          onPress: () {
+            Navigator.pushReplacementNamed(context, '/zerostatehome');
+          },
+        ),
       ],
     );
   }
@@ -45,9 +60,31 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       if (currentStep < 3) {
         currentStep = currentStep + 1;
       } else {
+        print(userInfoAndPreferences);
+        FirebaseFunctions.addUserDetails(userInfoAndPreferences);
         Navigator.pushReplacementNamed(context, '/home');
       }
     });
+  }
+
+  void onUserDataComplete(UserData userData) {
+    userInfoAndPreferences["userData"] = userData.toJson();
+    updateStep();
+  }
+
+  void onLoanTypeComplete(LoanPreference loanTypeData) {
+    userInfoAndPreferences["loanPreference"] = loanTypeData.toJson();
+    updateStep();
+  }
+
+  void onLenderTypeComplete(LenderPreference lenderTypeData) {
+    userInfoAndPreferences["lenderPreference"] = lenderTypeData.toJson();
+    updateStep();
+  }
+
+  void onVerificationComplete(acceptedTerms) {
+    userInfoAndPreferences["acceptedTerms"] = acceptedTerms;
+    updateStep();
   }
 
   @override

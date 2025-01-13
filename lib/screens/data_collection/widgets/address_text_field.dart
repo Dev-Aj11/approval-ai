@@ -1,22 +1,39 @@
-import 'dart:convert';
-
 import 'package:approval_ai/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class Place {
+  final String description;
+  final String placeId;
+
+  Place({required this.description, required this.placeId});
+
+  factory Place.fromJson(Map<String, dynamic> json) {
+    return Place(
+      description: json['description'],
+      placeId: json['place_id'],
+    );
+  }
+}
 
 class AddressTextField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
+  final Function(String)? onChanged;
+  final Function(Map<String, String>)? onAddressSelected;
+  final bool showSuggestions;
   final FocusNode focusNode;
-  final String? Function(String?)? validator;
-  final Function(String) onAddressSelected;
+  final Function(String?) validator;
 
   const AddressTextField({
     required this.label,
     required this.controller,
     required this.focusNode,
-    this.validator,
-    required this.onAddressSelected,
+    required this.validator,
+    this.onChanged,
+    this.onAddressSelected,
+    this.showSuggestions = true,
     super.key,
   });
 
@@ -25,119 +42,147 @@ class AddressTextField extends StatefulWidget {
 }
 
 class _AddressTextFieldState extends State<AddressTextField> {
-  List<String> suggestions = [];
-  OverlayEntry? _overlayEntry;
-  final _placesKey = 'AIzaSyB1WWuh6fveysdRw1_HnwWobI4eNOfMiP0';
-  final LayerLink _layerLink = LayerLink();
+  List<Place> _places = [];
+  bool _isLoading = false;
 
   @override
-  Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: CustomTextField(
-        label: widget.label,
-        controller: widget.controller,
-        focusNode: widget.focusNode,
-        validator: widget.validator,
-        suffixIcon: const Icon(Icons.location_on_outlined),
-        onChanged:
-            _onSearchAddress, // We'll need to add this to CustomTextField
-      ),
-    );
-  }
-
-  void _onSearchAddress(String value) {
-    // Call Places API here and show suggestions
-    _getSuggestions(value);
-  }
-
-  void _getSuggestions(String input) async {
-    if (input.isEmpty) {
-      _removeOverlay();
-      return;
-    }
-
-    // Here you would normally call the Places API
-    // For now, let's use mock data
-    try {
-      final response = await http.get(
-          Uri.parse(
-              'https://maps.googleapis.com/maps/api/place/autocomplete/json'
-              '?input=$input'
-              '&components=country:us'
-              '&key=$_placesKey'),
-          headers: {"Access-Control-Allow-Origin": "*"});
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print(data);
-        if (data['status'] == 'OK') {
-          setState(() {
-            suggestions = (data['predictions'] as List)
-                .map((prediction) => prediction['description'] as String)
-                .toList();
-          });
-          _showOverlay();
-        }
-      }
-    } catch (e) {
-      print('Error fetching suggestions: $e');
-    }
-  }
-
-  void _showOverlay() {
-    _removeOverlay();
-
-    final overlay = Overlay.of(context);
-    final renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        width: size.width,
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          offset: Offset(0, size.height + 5),
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: 200,
-              ),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: suggestions.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(suggestions[index]),
-                    onTap: () {
-                      widget.controller.text = suggestions[index];
-                      widget.onAddressSelected(suggestions[index]);
-                      _removeOverlay();
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(_overlayEntry!);
-  }
-
-  void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
-    _removeOverlay();
+    widget.focusNode.removeListener(_onFocusChange);
+    widget.focusNode.dispose();
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!widget.focusNode.hasFocus) {
+      setState(() {
+        _places = [];
+      });
+    }
+  }
+
+  Future<void> _getPlacePredictions(String input) async {
+    if (input.isEmpty) {
+      setState(() => _places = []);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://us-central1-approval-ai.cloudfunctions.net/placeAutocomplete?input=$input'));
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (json['status'] == 'OK') {
+          final predictions = (json['predictions'] as List)
+              .map((place) => Place.fromJson(place))
+              .toList();
+          setState(() => _places = predictions);
+        } else {
+          print('Error: ${json['status']}');
+          setState(() => _places = []);
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() => _places = []);
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  void _onAddressSelected(String address) {
+    setState(() {
+      widget.controller.text = address;
+      _places = [];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          label: widget.label,
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          hint: 'Enter your address',
+          suffixIcon: _isLoading
+              ? const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.location_on_outlined),
+          onChanged: (value) {
+            _getPlacePredictions(value);
+            widget.onChanged?.call(value);
+          },
+          validator: _addressValidator,
+        ),
+        if (_places.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: _places
+                  .map(
+                    (suggestion) => InkWell(
+                      onTapDown: (_) =>
+                          _onAddressSelected(suggestion.description),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.location_on_outlined, size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                suggestion.description,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  String? _addressValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter an address';
+    }
+    if (value.length < 5) {
+      return 'Please enter a valid address';
+    }
+    return null;
   }
 }

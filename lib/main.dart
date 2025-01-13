@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: GoogleFonts.inter().fontFamily, // set default font
       ),
-      initialRoute: '/home',
+      initialRoute: '/datacollection',
       routes: {
         // '/': (context) => const AuthGate(), // need to figure out how to work with AuthGate
         '/signup': (context) => const SignUpScreen(),

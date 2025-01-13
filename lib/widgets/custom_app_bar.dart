@@ -16,6 +16,31 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(60);
 
+  _buildCustomTextButton(index) {
+    return TextButton(
+      onPressed: buttons[index].onPress,
+      style: ButtonStyle(
+        overlayColor: WidgetStateProperty.resolveWith<Color>(
+          (states) => states.contains(WidgetState.hovered)
+              ? Colors.grey.shade100
+              : Colors.transparent,
+        ),
+        shape: WidgetStateProperty.resolveWith<RoundedRectangleBorder>(
+            (states) => states.contains(WidgetState.hovered)
+                ? RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  )
+                : RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0),
+                  )),
+      ),
+      child: Text(
+        buttons[index].label,
+        style: TextStyle(color: Colors.black),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,13 +76,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         actions: List.generate(
           buttons.length,
-          (index) => TextButton(
-            onPressed: buttons[index].onPress,
-            child: Text(
-              buttons[index].label,
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
+          (index) => _buildCustomTextButton(index),
         ),
       ),
     );

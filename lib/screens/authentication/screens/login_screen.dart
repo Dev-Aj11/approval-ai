@@ -78,7 +78,7 @@ class _LoginFormState extends State<LoginForm> {
       if (!userCredential.user!.emailVerified) {
         Navigator.pushReplacementNamed(context, '/verifyemail');
       } else {
-        Navigator.pushReplacementNamed(context, '/overview');
+        Navigator.pushReplacementNamed(context, '/datacollection');
       }
     } on FirebaseAuthException catch (e) {
       // handle login errors

@@ -1,0 +1,21 @@
+{
+    "root": true,
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "rules": {
+        "no-restricted-globals": [
+            "error",
+            "name",
+            "length"
+        ],
+        "prefer-arrow-callback": "warning"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    }
+}

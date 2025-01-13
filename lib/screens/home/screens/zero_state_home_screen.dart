@@ -2,17 +2,33 @@ import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ZeroStateHomeScreen extends StatelessWidget {
-  const ZeroStateHomeScreen({super.key});
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  ZeroStateHomeScreen({super.key});
+
+  Future<void> _onPressLogout(context) async {
+    try {
+      await _auth.signOut();
+      Navigator.pushNamed(context, '/login');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign out failed: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
         buttons: [
-          ButtonConfig(label: "Home", onPress: () {}),
-          ButtonConfig(label: "Logout", onPress: () {})
+          ButtonConfig(
+            label: "Logout",
+            onPress: () => _onPressLogout(context),
+          )
         ],
       ),
       body: Padding(
