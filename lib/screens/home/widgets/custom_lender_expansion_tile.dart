@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomLenderExpansionTile extends StatelessWidget {
-  final LenderDetails details;
+  final LenderMetricData details;
   const CustomLenderExpansionTile({required this.details, super.key});
 
   @override
@@ -27,7 +27,7 @@ class CustomLenderExpansionTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildExpandedTileButtonRow(),
+              // _buildExpandedTileButtonRow(),
               _buildExpandedTileMetrics()
             ],
           ),
@@ -37,39 +37,42 @@ class CustomLenderExpansionTile extends StatelessWidget {
   }
 
   _builExpansionTileHeader() {
+    var header = details.tileHeader;
     return Padding(
       padding: const EdgeInsets.only(top: 12.0, bottom: 12),
       child: Row(
         children: [
-          Icon(kLenderExpansionTileCardHeader[details]!.icon,
-              color: Colors.black),
+          Icon(header.icon, color: Colors.black),
           SizedBox(width: 8),
           Text(
-            kLenderExpansionTileCardHeader[details]!.title,
+            header.title,
             style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
-
+/*
   _buildExpandedTileButtonRow() {
+    var btnRow = LenderDetailsData.instance.getButtons(details);
     return Wrap(
       spacing: 16,
       runSpacing: 16,
       children: List.generate(
-        kLenderExpansionTileButtonRow[details]!.length,
+        btnRow.length,
         (index) {
           return CustomExpansionTileButtons(
-              label: kLenderExpansionTileButtonRow[details]![index].btnTitle,
-              icon: kLenderExpansionTileButtonRow[details]![index].icon,
-              onPress: kLenderExpansionTileButtonRow[details]![index].onPress);
+            label: btnRow[index].btnTitle,
+            icon: btnRow[index].icon,
+            onPress: btnRow[index].onPress,
+          );
         },
       ),
     );
-  }
+  }*/
 
   _buildExpandedTileMetrics() {
+    Map<String, String> metrics = details.toMap();
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32),
@@ -78,19 +81,18 @@ class CustomLenderExpansionTile extends StatelessWidget {
         runSpacing: 24,
         alignment: WrapAlignment.spaceBetween,
         runAlignment: WrapAlignment.center,
-        children: List.generate(
-          kLenderExpansionTileMetrics[details]!.length,
-          (index) {
-            return SizedBox(
-              width: 150,
-              child: MetricInfo(
-                metricName: kLenderExpansionTileMetrics[details]![index].title,
-                data: kLenderExpansionTileMetrics[details]![index].data,
-                centerData: true,
+        children: metrics.entries
+            .map(
+              (entry) => SizedBox(
+                width: 150,
+                child: MetricInfo(
+                  metricName: entry.key,
+                  data: entry.value,
+                  centerData: true,
+                ),
               ),
-            );
-          },
-        ),
+            )
+            .toList(),
       ),
     );
   }

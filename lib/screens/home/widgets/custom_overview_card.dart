@@ -65,6 +65,7 @@ class MetricInfo extends StatelessWidget {
         ),
         Text(
           metricName,
+          textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             fontSize: 14,
             color: Colors.black,

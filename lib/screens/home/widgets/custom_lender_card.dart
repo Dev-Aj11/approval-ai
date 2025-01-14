@@ -1,23 +1,12 @@
 import 'package:approval_ai/screens/home/model/lender_data.dart';
-import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
 import 'package:approval_ai/screens/home/widgets/custom_lender_expansion_tile.dart';
 import 'package:flutter/material.dart';
 
 class CustomLenderCard extends StatelessWidget {
-  final String lender;
-  final Status status;
-  late final String lenderName;
-  late final String lenderImg;
-  late final String lenderType;
-  late final String lenderLoanOfficer;
+  final LenderData lenderData;
 
-  CustomLenderCard({required this.lender, required this.status, super.key}) {
-    lenderName = kLenderDetails[lender]!["name"]!;
-    lenderImg = kLenderDetails[lender]!["logo"]!;
-    lenderType = kLenderDetails[lender]!["type"]!;
-    lenderLoanOfficer = kLenderDetails[lender]!["loanOfficer"]!;
-  }
+  const CustomLenderCard({required this.lenderData, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +24,29 @@ class CustomLenderCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           _buildLenderTitleRow(),
-          CustomLenderExpansionTile(details: LenderDetails.messagesExchagned),
-          CustomLenderExpansionTile(details: LenderDetails.estimateAnalysis),
-          CustomLenderExpansionTile(details: LenderDetails.negotiationAnalysis)
+          _buildMetricsExpansionTiles(lenderData.metrics),
         ],
       ),
+    );
+  }
+
+  _buildMetricsExpansionTiles(
+      Map<LenderDetailsEnum, LenderMetricData> metrics) {
+    return Column(
+      children: [
+        metrics.containsKey(LenderDetailsEnum.messagesExchagned)
+            ? CustomLenderExpansionTile(
+                details: metrics[LenderDetailsEnum.messagesExchagned]!)
+            : SizedBox(),
+        metrics.containsKey(LenderDetailsEnum.estimateAnalysis)
+            ? CustomLenderExpansionTile(
+                details: metrics[LenderDetailsEnum.estimateAnalysis]!)
+            : SizedBox(),
+        metrics.containsKey(LenderDetailsEnum.negotiationAnalysis)
+            ? CustomLenderExpansionTile(
+                details: metrics[LenderDetailsEnum.negotiationAnalysis]!)
+            : SizedBox(),
+      ],
     );
   }
 
@@ -61,11 +68,11 @@ class CustomLenderCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LenderImg(lenderImg: lenderImg),
+          LenderImg(lenderImg: lenderData.logoUrl),
           SizedBox(height: 8),
           _buildLenderMetadata(),
           SizedBox(height: 16),
-          LenderStatusBadge(type: status),
+          // LenderStatusBadge(type: status),
         ],
       ),
     );
@@ -76,10 +83,10 @@ class CustomLenderCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Row(
         children: [
-          LenderImg(lenderImg: lenderImg),
+          LenderImg(lenderImg: lenderData.logoUrl),
           SizedBox(width: 24),
           Expanded(child: _buildLenderMetadata()),
-          LenderStatusBadge(type: status),
+          // LenderStatusBadge(type: status),
         ],
       ),
     );
@@ -89,15 +96,19 @@ class CustomLenderCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LenderHeading(lenderName: lenderName),
+        LenderHeading(lenderName: lenderData.name),
         SizedBox(height: 8),
         Row(
           children: [
             CustomLenerDetails(
-                icon: Icons.account_balance_outlined, lenderInfo: lenderType),
+              icon: Icons.account_balance_outlined,
+              lenderInfo: lenderData.type,
+            ),
             SizedBox(width: 24),
             CustomLenerDetails(
-                icon: Icons.person_outlined, lenderInfo: lenderLoanOfficer),
+              icon: Icons.person_outlined,
+              lenderInfo: lenderData.loanOfficer,
+            ),
           ],
         ),
       ],

@@ -20,6 +20,20 @@ initializeApp();
 // Firestore under the path /messages/:documentId/original
 // ... existing imports ...
 
+// exports.getLenderStatus = onRequest(async (req, res) => {
+//     // Wrap the function in CORS middleware
+//     return cors(req, res, async () => {
+//         try {
+//             const response = await getFirestore().collection('users').doc(req.query.uid).collection('lenders').get();
+//             res.status(200).json({ result: 'Lender status fetched successfully' });
+//             res.json()
+//         } catch (error) {
+//             console.error('Error:', error);
+//             res.status(500).json({ error: 'Internal Server Error' });
+//         }
+//     });
+// });
+
 exports.addUserDetails = onRequest(async (req, res) => {
     // Wrap the function in CORS middleware
     return cors(req, res, async () => {

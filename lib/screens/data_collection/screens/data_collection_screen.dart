@@ -17,7 +17,7 @@ class DataCollectionScreen extends StatefulWidget {
 
 class _DataCollectionScreenState extends State<DataCollectionScreen> {
   int currentStep = 0;
-  var userInfoAndPreferences = {};
+  Map<String, dynamic> userInfoAndPreferences = {};
 
   Widget _buildCustomForm() {
     switch (currentStep) {
@@ -60,15 +60,14 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
       if (currentStep < 3) {
         currentStep = currentStep + 1;
       } else {
-        print(userInfoAndPreferences);
-        FirebaseFunctions.addUserDetails(userInfoAndPreferences);
+        FirebaseFunctions.addUserDetails({'userData': userInfoAndPreferences});
         Navigator.pushReplacementNamed(context, '/home');
       }
     });
   }
 
   void onUserDataComplete(UserData userData) {
-    userInfoAndPreferences["userData"] = userData.toJson();
+    userInfoAndPreferences["personalInfo"] = userData.toJson();
     updateStep();
   }
 

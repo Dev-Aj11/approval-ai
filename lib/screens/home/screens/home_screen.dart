@@ -1,3 +1,4 @@
+import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:approval_ai/screens/home/screens/leaderboard_screen.dart';
 import 'package:approval_ai/screens/home/widgets/custom_lender_card.dart';
@@ -7,10 +8,23 @@ import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:approval_ai/screens/home/model/lender_data.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  HomeScreen({super.key});
+  List<LenderData> _lenderData = [];
+  bool _isLoading = true;
+
+  void initState() {
+    super.initState();
+    _getLenderData();
+  }
 
   Future<void> _signOut(context) async {
     try {
@@ -21,6 +35,74 @@ class HomeScreen extends StatelessWidget {
         SnackBar(content: Text('Sign out failed: $e')),
       );
     }
+  }
+
+  Future<void> _getLenderData() async {
+    try {
+      final querySnapshotOnLenders = await FirebaseFunctions.getLenderDetails();
+      final documentSnapshotOnUsers = await FirebaseFunctions.getUserData();
+      final userInfo = documentSnapshotOnUsers.data() as Map<String, dynamic>;
+      final userLenderStatusInfo = userInfo["lenderData"];
+
+      final updatedLenderData =
+          querySnapshotOnLenders.docs.map((lenderDataDoc) {
+        final lenderInfo = lenderDataDoc.data() as Map<String, dynamic>;
+        final loanOfficerInfo =
+            lenderInfo['loanOfficer'] as Map<String, dynamic>;
+        final lenderName = lenderInfo['name'];
+        return LenderData(
+          name: lenderName,
+          type: lenderInfo['bankType'],
+          logoUrl: lenderInfo['logoUrl'],
+          loanOfficer: loanOfficerInfo.keys.first,
+          metrics: _buildLenderMetrics(userLenderStatusInfo[lenderDataDoc.id]),
+        );
+      }).toList();
+
+      setState(() {
+        _lenderData = updatedLenderData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // You might want to show an error message here
+    }
+  }
+
+  Map<LenderDetailsEnum, LenderMetricData> _buildLenderMetrics(
+      userLenderStatus) {
+    final metrics = <LenderDetailsEnum, LenderMetricData>{};
+    if (userLenderStatus['messagesExchanged'] != null) {
+      final messagesExchanged = userLenderStatus['messagesExchanged'];
+      metrics[LenderDetailsEnum.messagesExchagned] =
+          LenderDataMessagesExchanged(
+        emailsExchanged: messagesExchanged['emailsExchanged'],
+        textMessages: messagesExchanged['textMessages'],
+        phoneCalls: messagesExchanged['phoneCalls'],
+      );
+    }
+
+    if (userLenderStatus['estimateAnalysis'] != null) {
+      final estimateAnalysis = userLenderStatus['estimateAnalysis'];
+      metrics[LenderDetailsEnum.estimateAnalysis] = LenderDataEstimateAnalysis(
+        interestRate: estimateAnalysis['interestRate'],
+        lenderPayments: estimateAnalysis['lenderPayments'],
+        totalPayments: estimateAnalysis['totalPayments'],
+      );
+    }
+
+    if (userLenderStatus['negotiationAnalysis'] != null) {
+      final negotiationAnalysis = userLenderStatus['negotiationAnalysis'];
+      metrics[LenderDetailsEnum.negotiationAnalysis] =
+          LenderDataNegotiationAnalysis(
+        totalSavings: negotiationAnalysis['totalSavings'],
+        initialTotalPayments: negotiationAnalysis['initialTotalPayments'],
+        negotiatedTotalPayments: negotiationAnalysis['negotiatedTotalPayments'],
+      );
+    }
+    return metrics;
   }
 
   @override
@@ -95,30 +177,21 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildLenderDetails() {
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomSubHeading(label: "Lenders"),
         SizedBox(height: 24),
-        CustomLenderCard(
-          lender: "US Bank",
-          status: Status.contacted,
+        ..._lenderData.map(
+          (lenderData) => Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: CustomLenderCard(lenderData: lenderData),
+          ),
         ),
-        SizedBox(height: 24),
-        CustomLenderCard(
-          lender: "Wells Fargo",
-          status: Status.received,
-        ),
-        SizedBox(height: 24),
-        CustomLenderCard(
-          lender: "Citi Bank",
-          status: Status.complete,
-        ),
-        SizedBox(height: 24),
-        CustomLenderCard(
-          lender: "Chase Bank",
-          status: Status.complete,
-        )
       ],
     );
   }

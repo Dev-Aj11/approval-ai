@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+// import 'firebase_functions.dart';
 
 void main() async {
   // tells Flutter not to start running application until Flutter framework is completely booted
