@@ -1,3 +1,4 @@
+import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/authentication/widgets/auth_text_button.dart';
 import 'package:approval_ai/widgets/custom_text_field.dart';
 import 'package:approval_ai/screens/authentication/widgets/header.dart';
@@ -77,11 +78,15 @@ class _LoginFormState extends State<LoginForm> {
       );
       if (!userCredential.user!.emailVerified) {
         Navigator.pushReplacementNamed(context, '/verifyemail');
+      }
+      var documentSnapshot = await FirebaseFunctions.getUserData();
+      if (documentSnapshot.data() != null) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       } else {
-        Navigator.pushReplacementNamed(context, '/datacollection');
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/datacollection', (route) => false);
       }
     } on FirebaseAuthException catch (e) {
-      // handle login errors
       String errorMessage = '';
       if (e.code == 'user-not-found') {
         errorMessage = 'No user found for that email.';

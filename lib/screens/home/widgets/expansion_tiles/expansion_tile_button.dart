@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CustomExpansionTileButtons extends StatelessWidget {
+class ExpansionTileButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onPress;
 
-  const CustomExpansionTileButtons({
+  const ExpansionTileButton({
     required this.label,
     required this.icon,
     required this.onPress,

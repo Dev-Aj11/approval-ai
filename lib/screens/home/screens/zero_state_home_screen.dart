@@ -20,6 +20,10 @@ class ZeroStateHomeScreen extends StatelessWidget {
     }
   }
 
+  _onPressGetStarted(context) {
+    Navigator.pushReplacementNamed(context, '/datacollection');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +85,7 @@ class ZeroStateHomeScreen extends StatelessWidget {
                 SizedBox(height: 50),
                 PrimaryCta(
                   label: "Get Started",
-                  onPressCb: () {},
+                  onPressCb: () => _onPressGetStarted(context),
                 ),
               ],
             ),

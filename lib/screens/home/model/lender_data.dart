@@ -1,3 +1,5 @@
+import 'package:approval_ai/models/loan_estimate.dart';
+import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:flutter/material.dart';
 
 enum LenderDetailsEnum {
@@ -14,6 +16,7 @@ abstract class LenderMetricData {
   // Optional: Add common methods or properties
   // this is an abstract method that all classes that extend LenderMetricData must implement
   LenderExpansionTileCardHeader get tileHeader;
+  // List<dynamic> getButtons();
   Map<String, String> toMap();
 }
 
@@ -65,13 +68,12 @@ class LenderDataNegotiationAnalysis extends LenderMetricData {
   final String initialTotalPayments;
   final String negotiatedTotalPayments;
 
-  const LenderDataNegotiationAnalysis({
-    this.tileHeader = const LenderExpansionTileCardHeader(
-        icon: Icons.shopping_basket, title: "Negotiation Analysis"),
-    required this.totalSavings,
-    required this.initialTotalPayments,
-    required this.negotiatedTotalPayments,
-  });
+  const LenderDataNegotiationAnalysis(
+      {this.tileHeader = const LenderExpansionTileCardHeader(
+          icon: Icons.attach_money, title: "Negotiation Analysis"),
+      required this.totalSavings,
+      required this.initialTotalPayments,
+      required this.negotiatedTotalPayments});
 
   @override
   Map<String, String> toMap() => {
@@ -86,6 +88,7 @@ class LenderData {
   final String type;
   final String logoUrl;
   final String loanOfficer;
+  final List<LenderStatusEnum> currStatus;
   final Map<LenderDetailsEnum, LenderMetricData> metrics;
 
   const LenderData({
@@ -93,6 +96,7 @@ class LenderData {
     required this.type,
     required this.logoUrl,
     required this.loanOfficer,
+    required this.currStatus,
     required this.metrics,
   });
 
@@ -107,69 +111,6 @@ class LenderData {
   LenderDataNegotiationAnalysis get negotiationAnalysis =>
       metrics[LenderDetailsEnum.negotiationAnalysis]
           as LenderDataNegotiationAnalysis;
-}
-
-// IGNORE THIS
-class LenderDetailsData {
-  static final instance = LenderDetailsData._();
-  LenderDetailsData._();
-
-  final cardHeaders = {
-    LenderDetailsEnum.messagesExchagned: const LenderExpansionTileCardHeader(
-        icon: Icons.mail_outline, title: "Messages Exchanged"),
-    LenderDetailsEnum.estimateAnalysis: const LenderExpansionTileCardHeader(
-        icon: Icons.analytics_outlined, title: "Loan Estimate Analysis"),
-    LenderDetailsEnum.negotiationAnalysis: const LenderExpansionTileCardHeader(
-        icon: Icons.attach_money, title: "Negotiation Analysis"),
-  };
-
-  final buttonRows = {
-    LenderDetailsEnum.messagesExchagned: [
-      LenderExpansionTileButton(
-          icon: Icons.download, btnTitle: "Download Messages ", onPress: () {})
-    ],
-    LenderDetailsEnum.estimateAnalysis: [
-      LenderExpansionTileButton(
-          icon: Icons.arrow_drop_down, btnTitle: "5 years", onPress: () {}),
-      LenderExpansionTileButton(
-          icon: Icons.open_in_new, btnTitle: "View Estimate ", onPress: () {})
-    ],
-    LenderDetailsEnum.negotiationAnalysis: [
-      LenderExpansionTileButton(
-          icon: Icons.arrow_drop_down, btnTitle: "5 years", onPress: () {}),
-    ]
-  };
-
-  final metrics = {
-    LenderDetailsEnum.messagesExchagned: [
-      const LenderExpansionTileMetric(data: "12", title: "Documents Shared "),
-      const LenderExpansionTileMetric(data: "12", title: "Emails Exchanged "),
-      const LenderExpansionTileMetric(data: "12", title: "Text Messages"),
-      const LenderExpansionTileMetric(data: "12", title: "Phone Calls"),
-    ],
-    LenderDetailsEnum.estimateAnalysis: [
-      const LenderExpansionTileMetric(data: "A+", title: "Grade"),
-      const LenderExpansionTileMetric(data: "3.75%", title: "Interest Rate"),
-      const LenderExpansionTileMetric(data: "\$1200", title: "Lender Payments"),
-      const LenderExpansionTileMetric(data: "\$1400", title: "Total Payments"),
-    ],
-    LenderDetailsEnum.negotiationAnalysis: [
-      const LenderExpansionTileMetric(data: "\$200", title: "Total Savings"),
-      const LenderExpansionTileMetric(
-          data: "\$1200", title: "Initial\nTotal Payments"),
-      const LenderExpansionTileMetric(
-          data: "\$1000", title: "Negotiated \nTotal Payments")
-    ]
-  };
-
-  LenderExpansionTileCardHeader getHeader(LenderDetailsEnum detail) =>
-      cardHeaders[detail]!;
-
-  List<LenderExpansionTileButton> getButtons(LenderDetailsEnum detail) =>
-      buttonRows[detail]!;
-
-  List<LenderExpansionTileMetric> getMetrics(LenderDetailsEnum detail) =>
-      metrics[detail]!;
 }
 
 class LenderExpansionTileCardHeader {
@@ -204,82 +145,16 @@ class LenderExpansionTileMetric {
   });
 }
 
-// models/lender_ranking.dart
-class LenderRanking {
+class LenderLeaderboardMetric {
   final String rankImage;
   final String name;
-  final String interestRate;
+  final String monthlyPayments;
   final String totalPayments;
 
-  const LenderRanking({
+  const LenderLeaderboardMetric({
     required this.rankImage,
     required this.name,
-    required this.interestRate,
+    required this.monthlyPayments,
     required this.totalPayments,
   });
 }
-
-class LenderRepository {
-  static final instance = LenderRepository._();
-  LenderRepository._();
-
-  final Map<String, Map<String, String>> details = {
-    "US Bank": {
-      "name": "US Bank",
-      "type": "Retail Bank",
-      "loanOfficer": "John Smith",
-      "logo": "assets/img/us_bank.png"
-    },
-    "Wells Fargo": {
-      "name": "Wells Fargo",
-      "type": "Retail Bank",
-      "loanOfficer": "Jane Doe",
-      "logo": "assets/img/wells_fargo_bank.png"
-    },
-    "Citi Bank": {
-      "name": "Citi Bank",
-      "type": "Retail Bank",
-      "loanOfficer": "Jane Doe",
-      "logo": "assets/img/citi_bank.png"
-    },
-    "Chase Bank": {
-      "name": "Chase Bank",
-      "type": "Retail Bank",
-      "loanOfficer": "Jane Doe",
-      "logo": "assets/img/chase_bank.png"
-    }
-  };
-
-  Map<String, String>? getLenderDetails(String lenderName) =>
-      details[lenderName];
-}
-
-/*
-const kLenderStatus = {
-  "US Bank": {
-    "messages_exchanged": [
-      {"24": "Documents Shared"}
-    ],
-    "estimate_analysis": "Retail Bank",
-    "negotiation_analysis": "John Smith",
-  },
-  "Wells Fargo": {
-    "name": "Wells Fargo",
-    "type": "Retail Bank",
-    "loanOfficer": "Jane Doe",
-    "logo": "assets/img/wells_fargo_bank.png"
-  },
-  "Citi Bank": {
-    "name": "Citi Bank",
-    "type": "Retail Bank",
-    "loanOfficer": "Jane Doe",
-    "logo": "assets/img/citi_bank.png"
-  },
-  "Chase Bank": {
-    "name": "Wells Fargo",
-    "type": "Retail Bank",
-    "loanOfficer": "Jane Doe",
-    "logo": "assets/img/chase_bank.png"
-  }
-};
-*/

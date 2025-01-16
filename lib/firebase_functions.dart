@@ -19,7 +19,13 @@ class FirebaseFunctions {
           lenderDetails[doc.id] = {
             "messagesExchanged": null,
             "estimateAnalysis": null,
-            "negotiationAnalysis": null
+            "negotiationAnalysis": null,
+            "status": {
+              "contacted": true,
+              "estimateReceived": false,
+              "negotiationInProgress": false,
+              "negotiationCompleted": false,
+            }
           };
         },
       );

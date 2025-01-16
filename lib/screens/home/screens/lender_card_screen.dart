@@ -1,24 +1,17 @@
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
-import 'package:approval_ai/screens/home/widgets/custom_lender_expansion_tile.dart';
+import 'package:approval_ai/screens/home/widgets/expansion_tiles/lender_expansion_tile.dart';
 import 'package:flutter/material.dart';
 
-class CustomLenderCard extends StatelessWidget {
+class LenderCardScreen extends StatelessWidget {
   final LenderData lenderData;
 
-  const CustomLenderCard({required this.lenderData, super.key});
+  const LenderCardScreen({required this.lenderData, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Color(0xffD9D9D9),
-          width: 1,
-        ),
-      ),
+      decoration: _getLenderCardStyle(),
       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -30,21 +23,34 @@ class CustomLenderCard extends StatelessWidget {
     );
   }
 
+  _getLenderCardStyle() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(
+        color: Color(0xffD9D9D9),
+        width: 1,
+      ),
+    );
+  }
+
+  // build metrics expansion tiles if metrics exist in LenderData
   _buildMetricsExpansionTiles(
       Map<LenderDetailsEnum, LenderMetricData> metrics) {
+    var messages = LenderDetailsEnum.messagesExchagned;
+    var estimate = LenderDetailsEnum.estimateAnalysis;
+    var negotiation = LenderDetailsEnum.negotiationAnalysis;
+
     return Column(
       children: [
-        metrics.containsKey(LenderDetailsEnum.messagesExchagned)
-            ? CustomLenderExpansionTile(
-                details: metrics[LenderDetailsEnum.messagesExchagned]!)
+        metrics.containsKey(messages)
+            ? LenderExpansionTile(lenderData: metrics[messages]!)
             : SizedBox(),
-        metrics.containsKey(LenderDetailsEnum.estimateAnalysis)
-            ? CustomLenderExpansionTile(
-                details: metrics[LenderDetailsEnum.estimateAnalysis]!)
+        metrics.containsKey(estimate)
+            ? LenderExpansionTile(lenderData: metrics[estimate]!)
             : SizedBox(),
-        metrics.containsKey(LenderDetailsEnum.negotiationAnalysis)
-            ? CustomLenderExpansionTile(
-                details: metrics[LenderDetailsEnum.negotiationAnalysis]!)
+        metrics.containsKey(negotiation)
+            ? LenderExpansionTile(lenderData: metrics[negotiation]!)
             : SizedBox(),
       ],
     );
@@ -72,7 +78,7 @@ class CustomLenderCard extends StatelessWidget {
           SizedBox(height: 8),
           _buildLenderMetadata(),
           SizedBox(height: 16),
-          // LenderStatusBadge(type: status),
+          LenderStatusBadge(type: lenderData.currStatus),
         ],
       ),
     );
@@ -86,7 +92,7 @@ class CustomLenderCard extends StatelessWidget {
           LenderImg(lenderImg: lenderData.logoUrl),
           SizedBox(width: 24),
           Expanded(child: _buildLenderMetadata()),
-          // LenderStatusBadge(type: status),
+          LenderStatusBadge(type: lenderData.currStatus),
         ],
       ),
     );

@@ -13,12 +13,15 @@ import 'firebase_options.dart';
 // import 'firebase_functions.dart';
 
 void main() async {
-  // tells Flutter not to start running application until Flutter framework is completely booted
+  // Ensure all bindings are initialized in the same zone as runApp
   WidgetsFlutterBinding.ensureInitialized();
-  // sets a connection between flutter app & firebase project
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Run the app in the same zone
   runApp(const MyApp());
 }
 
@@ -34,7 +37,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         fontFamily: GoogleFonts.inter().fontFamily, // set default font
       ),
-      initialRoute: '/datacollection',
+      initialRoute: '/login',
       routes: {
         // '/': (context) => const AuthGate(), // need to figure out how to work with AuthGate
         '/signup': (context) => const SignUpScreen(),

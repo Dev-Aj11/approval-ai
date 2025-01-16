@@ -1,10 +1,10 @@
 import 'package:approval_ai/screens/home/model/overview_data.dart';
+import 'package:approval_ai/screens/home/widgets/metric_info.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomOverviewCard extends StatelessWidget {
   final String metricData;
-  final Status metricType;
+  final LenderStatusEnum metricType;
   const CustomOverviewCard({
     required this.metricData,
     required this.metricType,
@@ -36,42 +36,6 @@ class CustomOverviewCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class MetricInfo extends StatelessWidget {
-  final String data;
-  final String metricName;
-  final bool centerData;
-  const MetricInfo(
-      {required this.data,
-      required this.metricName,
-      this.centerData = false,
-      super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          centerData ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      children: [
-        Text(
-          data,
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          metricName,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: Colors.black,
-          ),
-        ),
-      ],
     );
   }
 }

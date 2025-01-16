@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget {
-  String label;
-  String subheading;
-  bool newAccount;
-  Header(
+  final String label;
+  final String subheading;
+  final bool newAccount;
+  const Header(
       {required this.label,
       this.subheading = "",
       this.newAccount = false,

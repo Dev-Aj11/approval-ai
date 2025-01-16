@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum Status { contacted, received, negotiating, complete }
+enum LenderStatusEnum { contacted, received, negotiating, complete }
 
 // Style data for each metric type
 class MetricStyle {
@@ -20,27 +20,27 @@ class MetricStyle {
 }
 
 // Static styles for each metric type
-final Map<Status, MetricStyle> kMetricStyles = {
-  Status.contacted: MetricStyle(
+final Map<LenderStatusEnum, MetricStyle> kMetricStyles = {
+  LenderStatusEnum.contacted: MetricStyle(
       backgroundColor: Color(0xffE8F3FE),
       foregroundColor: Color(0xff198AF4),
       icon: Icons.phone,
       iconLabel: "Lenders Contacted",
       lenderLabel: "Lender Contacted"),
-  Status.received: MetricStyle(
+  LenderStatusEnum.received: MetricStyle(
       backgroundColor: Color(0xffEEEBFF),
       foregroundColor: Color(0xff5A36FF),
       icon: Icons.document_scanner_outlined,
       iconLabel: "Estimates Received",
       lenderLabel: "Estimate Received"),
-  Status.negotiating: MetricStyle(
+  LenderStatusEnum.negotiating: MetricStyle(
     backgroundColor: Color(0xffFFF2E6),
     foregroundColor: Color(0xffFF8001),
     icon: Icons.attach_money,
     iconLabel: "Negotiations In Progress",
     lenderLabel: "Negotiation In Progress",
   ),
-  Status.complete: MetricStyle(
+  LenderStatusEnum.complete: MetricStyle(
     backgroundColor: Color(0xffE5F9EE),
     foregroundColor: Color(0xff00C257),
     icon: Icons.handshake_outlined,
@@ -50,7 +50,7 @@ final Map<Status, MetricStyle> kMetricStyles = {
 };
 
 class MetricData {
-  final Status type;
+  final LenderStatusEnum type;
   static const double _iconSize = 54.0;
   static const double _iconInnerSize = 24.0;
 
@@ -78,9 +78,9 @@ class MetricData {
 }
 
 // Map of metric types to their data
-const Map<Status, MetricData> kMetricInfo = {
-  Status.contacted: MetricData(type: Status.contacted),
-  Status.received: MetricData(type: Status.received),
-  Status.negotiating: MetricData(type: Status.negotiating),
-  Status.complete: MetricData(type: Status.complete),
+const Map<LenderStatusEnum, MetricData> kMetricInfo = {
+  LenderStatusEnum.contacted: MetricData(type: LenderStatusEnum.contacted),
+  LenderStatusEnum.received: MetricData(type: LenderStatusEnum.received),
+  LenderStatusEnum.negotiating: MetricData(type: LenderStatusEnum.negotiating),
+  LenderStatusEnum.complete: MetricData(type: LenderStatusEnum.complete),
 };

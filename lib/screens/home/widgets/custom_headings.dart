@@ -69,12 +69,12 @@ class LenderImg extends StatelessWidget {
 }
 
 class LenderStatusBadge extends StatelessWidget {
-  final Status type;
+  final List<LenderStatusEnum> type;
   const LenderStatusBadge({required this.type, super.key});
 
   @override
   Widget build(BuildContext context) {
-    final style = kMetricStyles[type]!;
+    final style = kMetricStyles[type.first]!;
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
