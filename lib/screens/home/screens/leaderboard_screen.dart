@@ -35,11 +35,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             b.getTotalPayments(userSelectedLoanTerm),
           ),
     );
-    for (var estimate in widget.loanEstimates) {
-      print(estimate.lenderName);
-      print(estimate.monthlyPayment);
-      print(estimate.getTotalPayments(userSelectedLoanTerm));
-    }
   }
 
   @override

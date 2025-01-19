@@ -70,7 +70,10 @@ class LenderImg extends StatelessWidget {
 
 class LenderStatusBadge extends StatelessWidget {
   final List<LenderStatusEnum> type;
-  const LenderStatusBadge({required this.type, super.key});
+  const LenderStatusBadge({
+    required this.type,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +86,11 @@ class LenderStatusBadge extends StatelessWidget {
       ),
       child: Text(
         style.lenderLabel,
+        textAlign: TextAlign.center,
         style: GoogleFonts.inter(
             color: style.foregroundColor,
             fontSize: 14,
-            fontWeight: FontWeight.w500),
+            fontWeight: FontWeight.w400),
       ),
     );
   }

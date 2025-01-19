@@ -99,7 +99,7 @@ class SampleLoanEstimates {
     monthlyPayment: 3861.54,
     closingCosts: 1000,
     newClosingCosts: 500,
-    newMonthlyPayments: 4400,
+    newMonthlyPayments: 3800,
   );
 
   // simple loan; 30 years
@@ -112,7 +112,7 @@ class SampleLoanEstimates {
     monthlyPayment: 3599.17,
     closingCosts: 1000,
     newClosingCosts: 500,
-    newMonthlyPayments: 4400,
+    newMonthlyPayments: 3400,
   );
 
   // simple loan; 30 years
@@ -125,7 +125,7 @@ class SampleLoanEstimates {
     monthlyPayment: 3729.20,
     closingCosts: 1000,
     newClosingCosts: 500,
-    newMonthlyPayments: 4400,
+    newMonthlyPayments: 3000,
   );
 
   // adjustable rate loan; 7 year ARM

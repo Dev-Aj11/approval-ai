@@ -114,7 +114,7 @@ class DesktopLeaderboard extends StatelessWidget {
         children: [
           Expanded(flex: 1, child: Text("Rank")),
           Expanded(flex: 2, child: Text("Lender")),
-          Expanded(flex: 2, child: Text("Interest Rate")),
+          Expanded(flex: 2, child: Text("Monthly Payment")),
           Expanded(flex: 2, child: Text("Total Payments")),
           Opacity(
             opacity: 0,
@@ -247,13 +247,13 @@ class MobileLeaderboard extends StatelessWidget {
             children: [
               MetricInfo(
                 data: _formatMoney(ranking.monthlyPayments),
-                metricName: "Monthly payments",
+                metricName: "Monthly Payment",
                 centerData: true,
               ),
               SizedBox(width: 20),
               MetricInfo(
                 data: _formatMoney(ranking.totalPayments),
-                metricName: "Total payments",
+                metricName: "Total Payments",
                 centerData: true,
               )
             ],

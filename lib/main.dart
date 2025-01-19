@@ -1,3 +1,4 @@
+import 'package:approval_ai/screens/agent_interactions/screens/agent_interaction_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/forgot_pwd_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/reset_successful_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/sign_up_screen.dart';
@@ -6,6 +7,7 @@ import 'package:approval_ai/screens/authentication/screens/verify_email_screen.d
 import 'package:approval_ai/screens/data_collection/screens/data_collection_screen.dart';
 import 'package:approval_ai/screens/home/screens/home_screen.dart';
 import 'package:approval_ai/screens/home/screens/zero_state_home_screen.dart';
+import 'package:approval_ai/screens/how_it_works/screens/how_it_works.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -48,6 +50,8 @@ class MyApp extends StatelessWidget {
         '/verifyemail': (context) => VerifyEmailScreen(),
         '/zerostatehome': (context) => ZeroStateHomeScreen(),
         '/datacollection': (context) => DataCollectionScreen(),
+        '/howitworks': (context) => HowItWorksScreen(),
+        // '/agentinteractions': (context) => AgentInteractionScreen(),
       },
     );
   }

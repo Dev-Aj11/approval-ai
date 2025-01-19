@@ -36,7 +36,7 @@ class PrimaryCta extends StatelessWidget {
             : null,
         child: Text(
           label,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );
