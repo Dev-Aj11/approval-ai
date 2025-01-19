@@ -1,6 +1,7 @@
 import 'package:approval_ai/models/loan_estimate.dart';
 import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:approval_ai/screens/agent_interactions/screens/agent_interaction_screen.dart';
+import 'package:approval_ai/screens/agent_interactions/screens/messages_screen.dart';
 import 'package:approval_ai/screens/home/controller/home_controller.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:approval_ai/screens/home/screens/home_sections.dart';
@@ -113,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: (currentPage == "Home")
                   ? _buildDashboard()
-                  : _buildInteractions(),
+                  : _buildInteractions(), // change this to
             ),
           );
         },

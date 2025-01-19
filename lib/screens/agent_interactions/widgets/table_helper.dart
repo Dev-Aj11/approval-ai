@@ -96,6 +96,7 @@ class TableHelper {
   /// Returns the lender name text style used in tables
   static TextStyle getLenderNameStyle() {
     return GoogleFonts.inter(
+      color: Colors.black,
       fontSize: 14,
       fontWeight: FontWeight.w500,
     );
@@ -136,7 +137,7 @@ class TableConfig {
         'preview',
         'estimate'
       ];
-    } else if (width >= 800) {
+    } else if (width >= 900) {
       return ['lender', 'status', 'preview', 'estimate'];
     } else {
       return ['lender', 'preview'];
