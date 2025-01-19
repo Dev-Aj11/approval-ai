@@ -1,4 +1,5 @@
 import 'package:approval_ai/models/loan_estimate.dart';
+import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:flutter/material.dart';
 
@@ -88,8 +89,10 @@ class LenderData {
   final String type;
   final String logoUrl;
   final String loanOfficer;
+  final List<MessageData> messages;
   final List<LenderStatusEnum> currStatus;
   final Map<LenderDetailsEnum, LenderMetricData> metrics;
+  final String? estimateUrl;
 
   const LenderData({
     required this.name,
@@ -98,6 +101,8 @@ class LenderData {
     required this.loanOfficer,
     required this.currStatus,
     required this.metrics,
+    required this.messages,
+    this.estimateUrl,
   });
 
   // Convenience getters

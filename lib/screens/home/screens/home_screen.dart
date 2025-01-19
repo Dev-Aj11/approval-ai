@@ -1,7 +1,5 @@
 import 'package:approval_ai/models/loan_estimate.dart';
-import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:approval_ai/screens/agent_interactions/screens/agent_interaction_screen.dart';
-import 'package:approval_ai/screens/agent_interactions/screens/messages_screen.dart';
 import 'package:approval_ai/screens/home/controller/home_controller.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:approval_ai/screens/home/screens/home_sections.dart';
@@ -28,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   final HomeController _controller = HomeController();
   List<LenderData> _lenderData = [];
-  String currentPage = "Messages";
+  String currentPage = "Home";
   bool _isLoading = true;
 
   @override
@@ -93,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _buildInteractions() {
     return AgentInteractionScreen(
-        isLoading: _isLoading, interactionData: kSampleInteractionDataList);
+        isLoading: _isLoading, lenderData: _lenderData);
   }
 
   @override

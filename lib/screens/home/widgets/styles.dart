@@ -16,15 +16,15 @@ class LeaderboardStyles {
 
   static TextStyle getLenderNameStyle() {
     return GoogleFonts.playfairDisplay(
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
     );
   }
 
   static TextStyle getMetricStyle() {
     return GoogleFonts.inter(
-      fontWeight: FontWeight.bold,
-      fontSize: 18,
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
     );
   }
 }

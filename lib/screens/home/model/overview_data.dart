@@ -58,7 +58,7 @@ class MetricData {
 
   String getMetricName() => kMetricStyles[type]!.iconLabel;
 
-  Widget getMetricIcon() {
+  Widget buildMetricIcon() {
     final style = kMetricStyles[type]!;
 
     return Container(

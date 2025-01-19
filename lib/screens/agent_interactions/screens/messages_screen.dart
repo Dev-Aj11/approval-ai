@@ -1,15 +1,23 @@
 import 'dart:math';
+import 'package:approval_ai/screens/agent_interactions/controller/agent_controller.dart';
 import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
+// COMPLETE and hooked to Firebase
 class MessagesScreen extends StatelessWidget {
-  final InteractionData interactionData;
-  const MessagesScreen({super.key, required this.interactionData});
+  final List<MessageData> messages;
+  final String loanOfficer;
+  final String lender;
+  const MessagesScreen(
+      {super.key,
+      required this.messages,
+      required this.loanOfficer,
+      required this.lender});
 
   @override
   Widget build(BuildContext context) {
-    final messages = interactionData.messages;
     return Dialog(
       shadowColor: Colors.grey[400],
       elevation: 4,
@@ -19,7 +27,7 @@ class MessagesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDialogContent(BuildContext context, List<Message> messages) {
+  Widget _buildDialogContent(BuildContext context, List<MessageData> messages) {
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: 700,
@@ -30,7 +38,7 @@ class MessagesScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _buildHeader(context),
-          _buildMessages(context, messages, interactionData.loanOfficer),
+          _buildMessages(context, messages, loanOfficer),
         ],
       ),
     );
@@ -47,7 +55,7 @@ class MessagesScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "${interactionData.loanOfficer} at ${interactionData.lender}",
+            "${loanOfficer} at ${lender}",
             style: GoogleFonts.playfairDisplay(
                 fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -65,7 +73,7 @@ class MessagesScreen extends StatelessWidget {
   }
 
   Widget _buildMessages(
-      BuildContext context, List<Message> messages, String loanOfficer) {
+      BuildContext context, List<MessageData> messages, String loanOfficer) {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
@@ -82,7 +90,7 @@ class MessagesScreen extends StatelessWidget {
   }
 
   Widget _buildMessageBubble(
-      BuildContext context, Message message, String loanOfficer) {
+      BuildContext context, MessageData message, String loanOfficer) {
     final isAIAgent = message.isFromAgent;
     return Column(
       crossAxisAlignment:
@@ -91,7 +99,7 @@ class MessagesScreen extends StatelessWidget {
         _buildSenderLabel(isAIAgent, loanOfficer),
         const SizedBox(height: 4),
         _buildMessageContent(context, message, isAIAgent),
-        _buildMessageMetadata(isAIAgent),
+        _buildMessageMetadata(isAIAgent, message),
       ],
     );
   }
@@ -107,7 +115,7 @@ class MessagesScreen extends StatelessWidget {
   }
 
   Widget _buildMessageContent(
-      BuildContext context, Message message, bool isAIAgent) {
+      BuildContext context, MessageData message, bool isAIAgent) {
     return Container(
       width: max(MediaQuery.of(context).size.width * 0.35, 300),
       decoration: BoxDecoration(
@@ -122,7 +130,9 @@ class MessagesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageMetadata(bool isAIAgent) {
+  Widget _buildMessageMetadata(bool isAIAgent, MessageData message) {
+    final dateFormat = DateFormat('MMM d'); // Format like "Jan 14"
+    final timeFormat = DateFormat('h:mm a');
     return Padding(
       padding: const EdgeInsets.only(
         top: 4,
@@ -135,22 +145,26 @@ class MessagesScreen extends StatelessWidget {
             isAIAgent ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           Text(
-            'Email',
+            _camelCase(message.mode),
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           const SizedBox(width: 8),
           Text(
-            'Jan 14',
+            dateFormat.format(message.timestamp),
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           const SizedBox(width: 8),
           Text(
-            '3:08 PM',
+            timeFormat.format(message.timestamp),
             style: const TextStyle(fontSize: 12, color: Color(0xff808080)),
           ),
         ],
       ),
     );
+  }
+
+  _camelCase(String str) {
+    return "${str.substring(0, 1).toUpperCase()}${str.substring(1).toLowerCase()}";
   }
 }
 

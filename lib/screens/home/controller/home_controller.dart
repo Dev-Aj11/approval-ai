@@ -1,4 +1,5 @@
 import 'package:approval_ai/firebase_functions.dart';
+import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
@@ -33,6 +34,8 @@ class HomeController {
 
       // get lender metada (lender name, type, logo, loan officer)
       final querySnapshotOnLenders = await FirebaseFunctions.getLenderDetails();
+
+      // create list of lender metadata for each user
       final updatedLenderData =
           querySnapshotOnLenders.docs.map((lenderDataDoc) {
         final lenderInfo = lenderDataDoc.data() as Map<String, dynamic>;
@@ -40,7 +43,7 @@ class HomeController {
             lenderInfo['loanOfficer'] as Map<String, dynamic>;
         final lenderName = lenderInfo['name'];
 
-        // return lender data widget
+        // return lender data class
         return LenderData(
           name: lenderName,
           type: lenderInfo['bankType'],
@@ -48,6 +51,8 @@ class HomeController {
           loanOfficer: loanOfficerInfo.keys.first,
           currStatus: _getLenderStatus(userLenderStatusInfo[lenderDataDoc.id]),
           metrics: _buildLenderMetrics(userLenderStatusInfo[lenderDataDoc.id]),
+          messages:
+              _buildLenderMessages(userLenderStatusInfo[lenderDataDoc.id]),
         );
       }).toList();
       return updatedLenderData;
@@ -55,6 +60,23 @@ class HomeController {
       print("Error getting lender data: $e");
       return [];
     }
+  }
+
+  List<MessageData> _buildLenderMessages(userLenderStatusInfo) {
+    final messages = userLenderStatusInfo['messages'];
+    final List<MessageData> messageList = [];
+    // messages.entries gives you a map with all key-value pairs in the map
+    for (var message in messages.entries) {
+      messageList.add(
+        MessageData(
+          content: message.value['content'],
+          timestamp: message.value['timestamp'].toDate(),
+          isFromAgent: message.value['isFromAgent'],
+          mode: message.value['mode'],
+        ),
+      );
+    }
+    return messageList;
   }
 
   List<LenderStatusEnum> _getLenderStatus(userLenderStatusInfo) {

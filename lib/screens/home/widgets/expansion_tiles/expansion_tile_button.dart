@@ -56,16 +56,19 @@ class ExpansionTileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onPress,
-      style: _getButtonStyle(),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: _getTextStyle()),
-          const SizedBox(width: 6),
-          Icon(icon, size: 20, color: Colors.black),
-        ],
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: OutlinedButton(
+        onPressed: onPress,
+        style: _getButtonStyle(),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label, style: _getTextStyle()),
+            const SizedBox(width: 6),
+            Icon(icon, size: 16, color: Colors.black),
+          ],
+        ),
       ),
     );
   }

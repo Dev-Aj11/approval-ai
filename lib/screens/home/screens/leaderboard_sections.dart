@@ -4,6 +4,7 @@ import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
 import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_button.dart';
 import 'package:approval_ai/screens/home/widgets/metric_info.dart';
 import 'package:approval_ai/screens/home/widgets/styles.dart';
+import 'package:approval_ai/widgets/table_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,7 +12,7 @@ class LeaderboardSections {
   static Widget buildLeaderboardHeaderWithFilter(selectedValue, onSelect) {
     return Row(
       children: [
-        Expanded(child: CustomSubHeading(label: "Leaderboard")),
+        Expanded(child: CustomSubHeading(label: "Best Deals")),
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: DropdownButton<String>(
@@ -44,6 +45,13 @@ class LeaderboardSections {
     );
   }
 
+  static Widget buildLeaderboardSubheading() {
+    return Text(
+      "We've crunched the numbers (so you don't have to). Here are the best deals so far!",
+      style: TableHelper.getRowStyle(),
+    );
+  }
+
   static Widget buildLeaderboardTable(
       List<LoanEstimate> bestLoanEstimates, userSelectedLoanTerm) {
     final List<LenderLeaderboardMetric> rankings =
@@ -64,13 +72,10 @@ class LeaderboardSections {
     });
 
     return LayoutBuilder(builder: (context, constraints) {
-      final isDesktop = constraints.maxWidth > 600;
+      final isDesktop = constraints.maxWidth > 900;
       return Container(
-        width: isDesktop ? double.infinity : 330,
+        width: double.infinity,
         decoration: isDesktop ? LeaderboardStyles.getDesktopStyle() : null,
-        padding: isDesktop
-            ? EdgeInsets.symmetric(horizontal: 36, vertical: 24)
-            : EdgeInsets.zero,
         child: isDesktop
             ? DesktopLeaderboard(rankings: rankings)
             : MobileLeaderboard(rankings: rankings),
@@ -90,7 +95,14 @@ class LeaderboardSections {
 
 class DesktopLeaderboard extends StatelessWidget {
   final List<LenderLeaderboardMetric> rankings;
-  const DesktopLeaderboard({required this.rankings, super.key});
+  final List<String> columns = [
+    'rank',
+    'lender',
+    'monthlyPayment',
+    'totalPayments',
+    ""
+  ];
+  DesktopLeaderboard({required this.rankings, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -98,35 +110,13 @@ class DesktopLeaderboard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildHeader(),
-        ...rankings.map((ranking) => _buildRow(ranking)),
+        ...rankings.map((ranking) => _buildRow(ranking, context)),
       ],
     );
   }
 
   Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xffD9D9D9))),
-      ),
-      child: Row(
-        children: [
-          Expanded(flex: 1, child: Text("Rank")),
-          Expanded(flex: 2, child: Text("Lender")),
-          Expanded(flex: 2, child: Text("Monthly Payment")),
-          Expanded(flex: 2, child: Text("Total Payments")),
-          Opacity(
-            opacity: 0,
-            child: ExpansionTileButton(
-              label: "Connect",
-              icon: Icons.message_outlined,
-              onPress: () {},
-            ),
-          ),
-        ],
-      ),
-    );
+    return TableHelper.buildLeaderboardTableHeader(columns);
   }
 
   String _formatMoney(data) {
@@ -137,60 +127,12 @@ class DesktopLeaderboard extends StatelessWidget {
         )}';
   }
 
-  Widget _buildRow(LenderLeaderboardMetric ranking) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        spacing: 24,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              child: RankImage(imagePath: ranking.rankImage),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                ranking.name,
-                style: LeaderboardStyles.getLenderNameStyle(),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                _formatMoney(ranking.monthlyPayments),
-                style: LeaderboardStyles.getMetricStyle(),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                _formatMoney(ranking.totalPayments),
-                style: LeaderboardStyles.getMetricStyle(),
-              ),
-            ),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            child: ExpansionTileButton(
-              label: "Connect",
-              icon: Icons.message_outlined,
-              onPress: () {},
-            ),
-          ),
-        ],
-      ),
+  Widget _buildRow(LenderLeaderboardMetric ranking, BuildContext context) {
+    return TableHelper.buildTableRow(
+      lenderData: null,
+      lenderLeaderboardData: ranking,
+      columns: columns,
+      context: context,
     );
   }
 }
@@ -202,8 +144,10 @@ class MobileLeaderboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Wrap(
       spacing: 24,
+      runSpacing: 24,
+      direction: Axis.horizontal,
       children: rankings.map((ranking) => _buildLenderCard(ranking)).toList(),
     );
   }
@@ -218,7 +162,7 @@ class MobileLeaderboard extends StatelessWidget {
 
   Widget _buildLenderCard(ranking) {
     return Container(
-      width: double.infinity,
+      width: 300,
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,

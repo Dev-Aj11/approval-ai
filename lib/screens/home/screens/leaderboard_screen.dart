@@ -39,17 +39,21 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // return Placeholder();
     int userSelectedLoanTerm = int.parse(selectedValue.split(" ")[0]);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        LeaderboardSections.buildLeaderboardHeaderWithFilter(
-            selectedValue, onSelectFilter),
-        SizedBox(height: 24),
-        LeaderboardSections.buildLeaderboardTable(
-            widget.loanEstimates, userSelectedLoanTerm),
-      ],
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 1100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LeaderboardSections.buildLeaderboardHeaderWithFilter(
+              selectedValue, onSelectFilter),
+          SizedBox(height: 0),
+          LeaderboardSections.buildLeaderboardSubheading(),
+          SizedBox(height: 16),
+          LeaderboardSections.buildLeaderboardTable(
+              widget.loanEstimates, userSelectedLoanTerm),
+        ],
+      ),
     );
   }
 }
