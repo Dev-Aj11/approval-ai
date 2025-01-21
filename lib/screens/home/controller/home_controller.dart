@@ -1,5 +1,6 @@
 import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
+import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
@@ -13,6 +14,26 @@ class HomeController {
     LenderStatusEnum.negotiating: 0,
     LenderStatusEnum.complete: 0,
   };
+
+  List<LoanEstimateData> getRecentLoanEstimatesForEachLender(lenderDataItems) {
+    List<LoanEstimateData> recentLoanEstimates = [];
+
+    for (var lenderDataItem in lenderDataItems) {
+      if (lenderDataItem.estimateData != null) {
+        // check if there are more than one estimate
+        if (lenderDataItem.estimateData!.length > 1) {
+          // sorting in descending order
+          lenderDataItem.estimateData.sort(
+              (LoanEstimateData a, LoanEstimateData b) =>
+                  b.timestamp.compareTo(a.timestamp));
+          // add the most recent estimate
+        }
+        recentLoanEstimates.add(lenderDataItem.estimateData![0]);
+      }
+    }
+
+    return recentLoanEstimates;
+  }
 
   Future<void> signOut(context) async {
     try {
@@ -50,7 +71,8 @@ class HomeController {
           logoUrl: lenderInfo['logoUrl'],
           loanOfficer: loanOfficerInfo.keys.first,
           currStatus: _getLenderStatus(userLenderStatusInfo[lenderDataDoc.id]),
-          metrics: _buildLenderMetrics(userLenderStatusInfo[lenderDataDoc.id]),
+          estimateData:
+              _buildEstimateData(userLenderStatusInfo[lenderDataDoc.id]),
           messages:
               _buildLenderMessages(userLenderStatusInfo[lenderDataDoc.id]),
         );
@@ -106,39 +128,142 @@ class HomeController {
     return lenderStatusList;
   }
 
-  // create lenderDataMessagesExchanged Widget if 'messagesExchanged' is not null
-  Map<LenderDetailsEnum, LenderMetricData> _buildLenderMetrics(
-      userLenderStatus) {
-    final metrics = <LenderDetailsEnum, LenderMetricData>{};
-    if (userLenderStatus['messagesExchanged'] != null) {
-      final messagesExchanged = userLenderStatus['messagesExchanged'];
-      metrics[LenderDetailsEnum.messagesExchagned] =
-          LenderDataMessagesExchanged(
-        emailsExchanged: messagesExchanged['emailsExchanged'],
-        textMessages: messagesExchanged['textMessages'],
-        phoneCalls: messagesExchanged['phoneCalls'],
+  List<LoanEstimateData> _buildEstimateData(userLenderStatusInfo) {
+    List<LoanEstimateData> estimateDataItems = [];
+    final estimateData = userLenderStatusInfo['estimateData'];
+    for (var estimateDataItem in estimateData) {
+      final closingCosts =
+          _getClosingCosts(estimateDataItem['closingCosts']) as ClosingCosts;
+
+      final monthlyPaymentRange =
+          _getMonthlyPaymentRange(estimateDataItem['monthlyPaymentRange']);
+      final comparisons = _getComparisons(estimateDataItem['comparisons']);
+      final loanDetails = _getLoanDetails(estimateDataItem['loanDetails']);
+
+      estimateDataItems.add(
+        LoanEstimateData(
+          lenderName: estimateDataItem['lenderName'],
+          estimateUrl: estimateDataItem['estimateUrl'],
+          balloonPayment: estimateDataItem['balloonPayment'],
+          prepaymentPenalty: estimateDataItem['prepaymentPenalty'],
+          monthlyPaymentAndInterest:
+              estimateDataItem['monthlyPaymentAndInterest'],
+          timestamp: estimateDataItem['timestamp'],
+          monthlyPaymentRange: monthlyPaymentRange,
+          closingCosts: closingCosts,
+          comparisons: comparisons, // estimateData['comparisons'],
+          loanDetails: loanDetails, //estimateData['loanDetails'],
+        ),
       );
     }
+    return estimateDataItems;
+  }
 
-    // create lenderDataEstimateAnalysis Widget if 'estimateAnalysis' is not null
-    if (userLenderStatus['estimateAnalysis'] != null) {
-      final estimateAnalysis = userLenderStatus['estimateAnalysis'];
-      metrics[LenderDetailsEnum.estimateAnalysis] = LenderDataEstimateAnalysis(
-          interestRate: estimateAnalysis['interestRate'],
-          lenderPayments: estimateAnalysis['lenderPayments'],
-          totalPayments: estimateAnalysis['totalPayments']);
-    }
-
-    // create lenderDataNegotiationAnalysis Widget if 'negotiationAnalysis' is not null
-    if (userLenderStatus['negotiationAnalysis'] != null) {
-      final negotiationAnalysis = userLenderStatus['negotiationAnalysis'];
-      metrics[LenderDetailsEnum.negotiationAnalysis] =
-          LenderDataNegotiationAnalysis(
-        totalSavings: negotiationAnalysis['totalSavings'],
-        initialTotalPayments: negotiationAnalysis['initialTotalPayments'],
-        negotiatedTotalPayments: negotiationAnalysis['negotiatedTotalPayments'],
+  _getLoanDetails(loanDetails) {
+    try {
+      final interestRate = loanDetails['interestRate'];
+      return LoanDetails(
+        term: loanDetails['term'],
+        loanAmount: loanDetails['loanAmount'],
+        interestRate: _getInterestRate(interestRate),
       );
+    } catch (e) {
+      print("Error getting loan details: $e");
+      return null;
     }
-    return metrics;
+  }
+
+  _getInterestRate(interestRate) {
+    try {
+      final adjustableData = interestRate['adjustable'];
+      bool isAdjustable = adjustableData['isAdjustable'];
+      var adjustableObj = Adjustable(isAdjustable: isAdjustable, details: null);
+      if (isAdjustable) {
+        final details = adjustableData['details'];
+        adjustableObj.details = AdjustmentDetails(
+          adjustmentFrequency: details['adjustmentFrequency'],
+          initialChangeMonth: details['initialChangeMonth'],
+          indexMargin: details['indexMargin'],
+          minRate: details['minRate'],
+          maxRate: details['maxRate'],
+          firstChangeLimit: details['firstChangeLimit'],
+          subsequentChangeLimit: details['subsequentChangeLimit'],
+        );
+      }
+      return InterestRate(
+        initial: interestRate['initial'],
+        adjustable: adjustableObj,
+      );
+    } catch (e) {
+      print("Error getting interest rate: $e");
+      return null;
+    }
+  }
+
+  _getMonthlyPaymentRange(monthlyPaymentRange) {
+    try {
+      return MonthlyPaymentRange(
+        min: monthlyPaymentRange['min'],
+        max: monthlyPaymentRange['max'],
+      );
+    } catch (e) {
+      print("Error getting monthly payment range: $e");
+      return null;
+    }
+  }
+
+  _getComparisons(comparisons) {
+    try {
+      final annualPercentageRate = comparisons['annualPercentageRate'];
+      final principalPaidIn5Years = comparisons['principalPaidIn5Years'];
+      final totalInterestPercentage = comparisons['totalInterestPercentage'];
+      final totalPaidIn5Years = comparisons['totalPaidIn5Years'];
+
+      return Comparisons(
+        annualPercentageRate: annualPercentageRate,
+        principalPaidIn5Years: principalPaidIn5Years,
+        totalInterestPercentage: totalInterestPercentage,
+        totalPaidIn5Years: totalPaidIn5Years,
+      );
+    } catch (e) {
+      print("Error getting comparisons: $e");
+      return null;
+    }
+  }
+
+  _getClosingCosts(clostingCostsdata) {
+    try {
+      final breakdown = clostingCostsdata['breakdown'];
+      final loanCosts = breakdown['loanCosts'];
+      final otherCosts = breakdown['otherCosts'];
+
+      // constructs closing costs Breakdown Object
+      final otherCostsObj = OtherCosts(
+        taxes: otherCosts['taxes'],
+        prepaids: otherCosts['prepaids'],
+        escrow: otherCosts['escrow'],
+        optionalCosts: otherCosts['optionalCosts'],
+      );
+
+      final loanCostsObj = LoanCosts(
+        originationCharges: loanCosts['originationCharges'],
+        servicesCannotShopFor: loanCosts['servicesCannotShopFor'],
+        servicesCanShopFor:
+            loanCosts['servicesCanShopFor'], // change to servicesCanShopFor
+      );
+
+      final closingCostsBreakdown = ClosingCostsBreakdown(
+        loanCosts: loanCostsObj,
+        otherCosts: otherCostsObj,
+      );
+      return ClosingCosts(
+        totalClosingCosts: clostingCostsdata['totalClosingCosts'],
+        cashToClose: clostingCostsdata['cashToClose'],
+        breakdown: closingCostsBreakdown,
+      );
+    } catch (e) {
+      print("Error getting closing costs: $e");
+      return null;
+    }
   }
 }

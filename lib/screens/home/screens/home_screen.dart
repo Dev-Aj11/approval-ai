@@ -10,12 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 
 // TODO: this should pull from firebase
-final kLoanEstimates = [
-  SampleLoanEstimates.simpleLoan,
-  SampleLoanEstimates.simpleLoanV2,
-  SampleLoanEstimates.simpleLoanV3,
-];
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
   @override
@@ -25,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   final HomeController _controller = HomeController();
-  List<LenderData> _lenderData = [];
+  List<LenderData> _lenderDataItems = [];
   String currentPage = "Home";
   bool _isLoading = true;
 
@@ -38,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadData() async {
     final data = await _controller.getLenderData();
     setState(() {
-      _lenderData = data;
+      _lenderDataItems = data;
       _isLoading = false;
     });
   }
@@ -70,28 +64,27 @@ class _HomeScreenState extends State<HomeScreen> {
   _buildDashboard() {
     // udpate this to see leaderboard
     // check if at least one estimate is received to load leaderboard
-    bool oneEstimateReceived =
-        _controller.lenderStatusCount[LenderStatusEnum.received]! == 0;
+    final recentLoanEstimates =
+        _controller.getRecentLoanEstimatesForEachLender(_lenderDataItems);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       HomeScreenSections.buildWelcomeHeader(),
       SizedBox(height: 50),
       HomeScreenSections.buildOverviewStats(_controller.lenderStatusCount),
       SizedBox(height: 56),
-      // load this only if estimates are received
-      // change this
-      (oneEstimateReceived)
+      // load leaderboard only if >=1 estimates is received
+      (recentLoanEstimates.isNotEmpty)
           ? Column(children: [
-              LeaderboardScreen(loanEstimates: kLoanEstimates),
+              LeaderboardScreen(loanEstimates: recentLoanEstimates),
               SizedBox(height: 56)
             ])
           : SizedBox(height: 0),
-      HomeScreenSections.buildLenderDetails(_isLoading, _lenderData),
+      HomeScreenSections.buildLenderInteractions(_isLoading, _lenderDataItems),
     ]);
   }
 
   _buildInteractions() {
     return AgentInteractionScreen(
-        isLoading: _isLoading, lenderData: _lenderData);
+        isLoading: _isLoading, lenderData: _lenderDataItems);
   }
 
   @override

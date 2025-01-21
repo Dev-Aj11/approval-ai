@@ -1,6 +1,9 @@
+import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
-import 'package:approval_ai/screens/home/widgets/expansion_tiles/lender_expansion_tile.dart';
+import 'package:approval_ai/screens/home/widgets/expansion_tiles/lender_estimate_expansion_tile.dart';
+import 'package:approval_ai/screens/home/widgets/expansion_tiles/lender_messages_expansion_tile.dart';
+import 'package:approval_ai/screens/home/widgets/expansion_tiles/lender_negotiation_expansion_tile.dart';
 import 'package:flutter/material.dart';
 
 class LenderCardScreen extends StatelessWidget {
@@ -17,7 +20,7 @@ class LenderCardScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           _buildLenderTitleRow(),
-          _buildMetricsExpansionTiles(lenderData.metrics),
+          _buildMetricsExpansionTiles(),
         ],
       ),
     );
@@ -35,25 +38,56 @@ class LenderCardScreen extends StatelessWidget {
   }
 
   // build metrics expansion tiles if metrics exist in LenderData
-  _buildMetricsExpansionTiles(
-      Map<LenderDetailsEnum, LenderMetricData> metrics) {
-    var messages = LenderDetailsEnum.messagesExchagned;
-    var estimate = LenderDetailsEnum.estimateAnalysis;
-    var negotiation = LenderDetailsEnum.negotiationAnalysis;
+  _buildMetricsExpansionTiles() {
+    return Column(children: [
+      _buildMessagesExpansionTile(),
+      _buildLenderEstimateAnalysisExpansionTile(),
+      _buildLenderNegotiationAnalysisExpansionTile(),
+    ]);
+  }
 
-    return Column(
-      children: [
-        metrics.containsKey(messages)
-            ? LenderExpansionTile(lenderData: metrics[messages]!)
-            : SizedBox(),
-        metrics.containsKey(estimate)
-            ? LenderExpansionTile(lenderData: metrics[estimate]!)
-            : SizedBox(),
-        metrics.containsKey(negotiation)
-            ? LenderExpansionTile(lenderData: metrics[negotiation]!)
-            : SizedBox(),
-      ],
+  _buildMessagesExpansionTile() {
+    bool messagesExist = lenderData.messages.isNotEmpty;
+    if (!messagesExist) {
+      return SizedBox();
+    }
+    return LenderMessagesExpansionTile(
+      lenderMessages: lenderData.messages,
+      emailsExchanged: lenderData.emailsExchanged,
+      phoneCallsExchanged: lenderData.phoneCallsExchanged,
+      textsExchanged: lenderData.textsExchanged,
     );
+  }
+
+  _buildLenderEstimateAnalysisExpansionTile() {
+    List<LoanEstimateData>? loanEstimatesData = lenderData.estimateData;
+    // get most recent and initial estimate
+    LoanEstimateData? mostRecentEstimate;
+    if (loanEstimatesData != null) {
+      mostRecentEstimate = lenderData.mostRecentEstimate;
+      return LenderEstimateAnalysisExpansionTile(
+        loanEstimate: mostRecentEstimate!,
+      );
+    }
+    return null;
+  }
+
+  _buildLenderNegotiationAnalysisExpansionTile() {
+    List<LoanEstimateData>? loanEstimatesData = lenderData.estimateData;
+    // get most recent and initial estimate
+    LoanEstimateData? mostRecentEstimate;
+    LoanEstimateData? initialEstimate;
+    if (loanEstimatesData != null) {
+      mostRecentEstimate = lenderData.mostRecentEstimate;
+      if (loanEstimatesData.length > 1) {
+        initialEstimate = lenderData.initialEstimate;
+        return LenderNegotiationExpansionTile(
+          initialLoanEstimate: initialEstimate!,
+          finalLoanEstimate: mostRecentEstimate!,
+        );
+      }
+    }
+    return null;
   }
 
   _buildLenderTitleRow() {

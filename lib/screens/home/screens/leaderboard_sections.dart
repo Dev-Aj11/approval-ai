@@ -1,4 +1,5 @@
 import 'package:approval_ai/models/loan_estimate.dart';
+import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
 import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_button.dart';
@@ -53,19 +54,20 @@ class LeaderboardSections {
   }
 
   static Widget buildLeaderboardTable(
-      List<LoanEstimate> bestLoanEstimates, userSelectedLoanTerm) {
+      List<LoanEstimateData> bestLoanEstimates, userSelectedLoanTerm) {
     final List<LenderLeaderboardMetric> rankings =
         List.generate(bestLoanEstimates.length, (index) {
       String rankImage = _getImgPath(index);
       String monthlyPayments =
-          bestLoanEstimates[index].monthlyPayment.floor().toString();
+          bestLoanEstimates[index].monthlyPaymentAndInterest.floor().toString();
       String totalPayments = bestLoanEstimates[index]
           .getTotalPayments(userSelectedLoanTerm)
+          .floor()
           .toString();
 
       return LenderLeaderboardMetric(
         rankImage: rankImage,
-        name: bestLoanEstimates[index].lenderName,
+        name: "US BANK", //bestLoanEstimates[index].lenderName,
         monthlyPayments: "\$$monthlyPayments",
         totalPayments: "\$$totalPayments",
       );

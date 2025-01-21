@@ -1,9 +1,9 @@
-import 'package:approval_ai/models/loan_estimate.dart';
+import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import './leaderboard_sections.dart';
 import 'package:flutter/material.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  final List<LoanEstimate> loanEstimates;
+  final List<LoanEstimateData> loanEstimates;
   const LeaderboardScreen({super.key, required this.loanEstimates});
 
   @override
@@ -12,7 +12,7 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   String selectedValue = "5 years";
-  List<LoanEstimate> bestLoanEstimates = [];
+  List<LoanEstimateData> bestLoanEstimates = [];
 
   @override
   void initState() {
@@ -28,13 +28,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
   void getBestLoanEstimates() {
     int userSelectedLoanTerm = int.parse(selectedValue.split(" ")[0]);
-    // sort all loan estimates from lowest total payments to highest total payments
-    // compareTo is comparing loan estimates from loan A with loan B
-    widget.loanEstimates.sort(
-      (a, b) => a.getTotalPayments(userSelectedLoanTerm).compareTo(
-            b.getTotalPayments(userSelectedLoanTerm),
-          ),
-    );
+    if (widget.loanEstimates.length > 1) {
+      // sort all loan estimates from lowest total payments to highest total payments
+      // compareTo is comparing loan estimates from loan A with loan B
+      widget.loanEstimates.sort(
+        (a, b) => a.getTotalPayments(userSelectedLoanTerm).compareTo(
+              b.getTotalPayments(userSelectedLoanTerm),
+            ),
+      );
+    }
   }
 
   @override

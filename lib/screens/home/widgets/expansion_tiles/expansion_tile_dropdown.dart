@@ -31,6 +31,7 @@ class _ExpansionTileDropdownState extends State<ExpansionTileDropdown> {
         decoration: _getDropDownBtnStyle(),
         child: DropdownButton(
             dropdownColor: Colors.white,
+            focusColor: Colors.white,
             style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
             isDense: true,
             underline: Container(), // remove underline

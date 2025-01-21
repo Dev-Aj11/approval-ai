@@ -93,6 +93,7 @@ class TableHelper {
           ),
         );
       case 'lender':
+        print("lenderName: ${leaderboardData.name}");
         return Expanded(
           flex: 2,
           child: Container(

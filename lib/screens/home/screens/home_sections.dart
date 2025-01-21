@@ -68,12 +68,11 @@ class HomeScreenSections {
     );
   }
 
-  static Widget buildLenderDetails(
+  static Widget buildLenderInteractions(
       bool isLoading, List<LenderData> lenderData) {
     if (isLoading) {
       return Center(child: CircularProgressIndicator());
     }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

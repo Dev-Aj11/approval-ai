@@ -56,18 +56,23 @@ class ExpansionTileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: OutlinedButton(
-        onPressed: onPress,
-        style: _getButtonStyle(),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label, style: _getTextStyle()),
-            const SizedBox(width: 6),
-            Icon(icon, size: 16, color: Colors.black),
-          ],
+    // Changed from fixed width Container to IntrinsicWidth
+    // A Flutter widget that sizes its child to the child's maximum intrinsic (natural) width.
+    return IntrinsicWidth(
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 180),
+        alignment: Alignment.centerLeft,
+        child: OutlinedButton(
+          onPressed: onPress,
+          style: _getButtonStyle(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: _getTextStyle()),
+              const SizedBox(width: 6),
+              Icon(icon, size: 16, color: Colors.black),
+            ],
+          ),
         ),
       ),
     );

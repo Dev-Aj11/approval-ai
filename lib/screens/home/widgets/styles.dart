@@ -15,9 +15,9 @@ class LeaderboardStyles {
   }
 
   static TextStyle getLenderNameStyle() {
-    return GoogleFonts.playfairDisplay(
+    return GoogleFonts.inter(
       fontSize: 18,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w500,
     );
   }
 

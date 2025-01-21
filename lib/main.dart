@@ -1,4 +1,3 @@
-import 'package:approval_ai/screens/agent_interactions/screens/agent_interaction_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/forgot_pwd_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/reset_successful_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/sign_up_screen.dart';

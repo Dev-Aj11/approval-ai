@@ -7,6 +7,7 @@ class FirebaseFunctions {
   static final String baseUrl =
       "https://us-central1-approval-ai.cloudfunctions.net";
 
+  // add new user to firebase
   static Future<void> addUserDetails(
       Map<String, dynamic> userInfoAndPreferences) async {
     try {
