@@ -2,8 +2,11 @@ import 'package:approval_ai/screens/authentication/widgets/auth_text_button.dart
 import 'package:approval_ai/widgets/custom_text_field.dart';
 import 'package:approval_ai/screens/authentication/widgets/header.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:approval_ai/controllers/auth_provider.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -11,7 +14,9 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
         child: SizedBox(
           width: 500,
           child: Column(
@@ -46,7 +51,7 @@ class _SignUpFormState extends State<SignUpForm> {
   final FocusNode _emailFocusNode = FocusNode(); // FocusNode for email field
   final FocusNode _passwordFocusNode =
       FocusNode(); // FocusNode for password field
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -74,18 +79,18 @@ class _SignUpFormState extends State<SignUpForm> {
   // send this function to be executed once login btn is executed
   Future<void> _signUpWithEmailAndPwd() async {
     try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      final User? user = userCredential.user;
+      final userCredential = await context.read<AuthProvider>().signUp(
+            _emailController.text.trim(),
+            _passwordController.text.trim(),
+          );
+      final user = userCredential.user;
+
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
+        // navigate to the verify email screen
+        context.push('/verifyemail');
       }
-      // navigate to the verify email screen
-      Navigator.pushReplacementNamed(context, '/verifyemail');
-    } on FirebaseAuthException catch (e) {
+    } on firebase_auth.FirebaseAuthException catch (e) {
       // String errorMessage = '';
       // if (e.code == 'email-already-in-use') {
       //   errorMessage = 'Account already exists';
@@ -99,7 +104,7 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void _onPressLoginHere() {
-    Navigator.pushNamed(context, '/login');
+    context.push('/login');
   }
 
   @override

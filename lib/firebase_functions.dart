@@ -17,16 +17,17 @@ class FirebaseFunctions {
       Map<String, dynamic> lenderDetails = {};
       lenderInfo.docs.forEach(
         (doc) {
+          // doc.id = lender name
+          // doc.data() = Map<String, dynamic> (lender name -> lender data)
           lenderDetails[doc.id] = {
-            "messagesExchanged": null,
-            "estimateAnalysis": null,
-            "negotiationAnalysis": null,
             "status": {
               "contacted": true,
               "estimateReceived": false,
               "negotiationInProgress": false,
               "negotiationCompleted": false,
-            }
+            },
+            "loanOfficer": (doc.data() as Map)['loanOfficer']
+                [0] // get first loan officer
           };
         },
       );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:approval_ai/widgets/custom_text_field.dart';
 import 'package:approval_ai/screens/authentication/widgets/header.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPwdScreen extends StatelessWidget {
   const ForgotPwdScreen({super.key});
@@ -10,23 +11,22 @@ class ForgotPwdScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 500,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Header(
-                  label: 'Reset your password',
-                  subheading:
-                      "Enter the email address linked to your account and we'll send you an email.",
-                ),
+      body: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Header(
+                label: 'Reset your password',
+                subheading:
+                    "Enter the email address linked to your account and we'll send you an email.",
               ),
-              Expanded(flex: 2, child: ForgotPwdForm())
-            ],
-          ),
+            ),
+            Expanded(flex: 2, child: ForgotPwdForm())
+          ],
         ),
       ),
     );
@@ -68,9 +68,11 @@ class _ForgotPwdFormState extends State<ForgotPwdForm> {
       return;
     }
     try {
+      print("sending password reset email to $email");
       await _auth.sendPasswordResetEmail(email: email);
-      Navigator.pushNamed(
-          context, '/resetsuccessful'); // show confirmation screen
+      print("sent password reset email to $email");
+      // show confirmation screen
+      context.push('/resetsuccessful');
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       if (e.code == 'user-not-found') {
@@ -89,22 +91,25 @@ class _ForgotPwdFormState extends State<ForgotPwdForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // email text field
-          CustomTextField(
-            label: 'Email',
-            focusNode: _focusNode,
-            controller: _emailController,
-            validator: (value) => _emailCheck(value),
-          ),
-          SizedBox(height: 40),
-          PrimaryCta(
-            label: "Send link",
-            onPressCb: _onPressForgotPwd,
-          ),
-        ],
+      child: SizedBox(
+        width: 400,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // email text field
+            CustomTextField(
+              label: 'Email',
+              focusNode: _focusNode,
+              controller: _emailController,
+              validator: (value) => _emailCheck(value),
+            ),
+            SizedBox(height: 40),
+            PrimaryCta(
+              label: "Send link",
+              onPressCb: _onPressForgotPwd,
+            ),
+          ],
+        ),
       ),
     );
   }

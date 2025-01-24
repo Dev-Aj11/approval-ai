@@ -1,13 +1,12 @@
 import 'package:approval_ai/screens/agent_interactions/controller/agent_controller.dart';
 import 'package:approval_ai/screens/agent_interactions/screens/messages_screen.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
-import 'package:approval_ai/screens/home/screens/leaderboard_sections.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
-import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_button.dart';
 import 'package:approval_ai/screens/home/widgets/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Helper class for shared table components and styles
 class TableHelper {
@@ -19,30 +18,39 @@ class TableHelper {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: columns
-            .map((column) => Expanded(
-                  flex: column == 'preview' ? 2 : 1,
-                  child: Text(
-                    TableConfig.columnHeaders[column]!,
-                    style: TableHelper.getHeaderStyle(),
-                  ),
-                ))
-            .toList(),
+        children: columns.map((column) {
+          return Expanded(
+            flex: column == 'preview' ? 2 : 1,
+            child: Text(
+              TableConfig.columnHeaders[column]!,
+              style: TableHelper.getHeaderStyle(),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
   static Widget buildLeaderboardTableHeader(List<String> columns) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 25),
+      padding: const EdgeInsets.only(left: 40, right: 40, top: 24, bottom: 22),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: columns.map((column) {
+          if (column == 'rank') {
+            return Container(
+              width: 100,
+              child: Text(
+                TableConfig.columnHeaders[column]!,
+                style: TableHelper.getHeaderStyle(),
+              ),
+            );
+          }
           return Expanded(
-            flex: column == 'lender' ? 2 : 1,
+            flex: 1,
             child: Container(
               padding: const EdgeInsets.only(right: 16.0),
               child: Text(
@@ -65,7 +73,7 @@ class TableHelper {
       required BuildContext context}) {
     var data = (lenderData != null) ? lenderData : lenderLeaderboardData!;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 35),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
@@ -85,24 +93,22 @@ class TableHelper {
       LenderLeaderboardMetric leaderboardData, BuildContext context) {
     switch (column) {
       case 'rank':
-        return Expanded(
-          flex: 1,
-          child: Container(
-            alignment: Alignment.centerLeft,
-            child: RankImage(imagePath: leaderboardData.rankImage),
-          ),
+        return Container(
+          width: 100,
+          alignment: Alignment.centerLeft,
+          child: Text(leaderboardData.rank.toString(),
+              style: LeaderboardStyles.getMetricStyle()),
         );
       case 'lender':
-        print("lenderName: ${leaderboardData.name}");
         return Expanded(
-          flex: 2,
+          flex: 1,
           child: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(right: 16.0),
             child: Text(
               textAlign: TextAlign.left,
               leaderboardData.name,
-              style: LeaderboardStyles.getLenderNameStyle(),
+              style: LeaderboardStyles.getMetricStyle(),
             ),
           ),
         );
@@ -121,16 +127,35 @@ class TableHelper {
           child: Container(
             alignment: Alignment.centerLeft,
             child: Text(formatMoney(leaderboardData.totalPayments),
-                style: LeaderboardStyles.getMetricStyle()),
+                style: LeaderboardStyles.getBoldMetricStyle()),
           ),
         );
       case '':
         return Expanded(
           flex: 1,
-          child: ExpansionTileButton(
-            label: "Connect",
-            icon: Icons.message_outlined,
-            onPress: () {},
+          child: TextButton(
+            style: TableHelper.getButtonStyle(),
+            onPressed: () {},
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text("Get Connected",
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.black)),
+                const SizedBox(width: 2),
+                Transform.translate(
+                  offset: const Offset(0, 3),
+                  child: const Icon(
+                    Icons.chevron_right,
+                    size: 14,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       default:
@@ -148,7 +173,12 @@ class TableHelper {
 
   static Widget buildInteractionTableCell(
       String column, LenderData lenderData, BuildContext context) {
-    var messages = AgentController.sortMessages(lenderData.messages);
+    // check if messages exist
+    if (lenderData.messages == null) {
+      return const Expanded(child: SizedBox());
+    }
+    // sort messages
+    var messages = AgentController.sortMessages(lenderData.messages!);
     DateTime lastContacted = messages.last.timestamp;
     String preview = messages.last.content;
     switch (column) {
@@ -211,9 +241,16 @@ class TableHelper {
           ),
         );
       case 'estimate':
+        var estimateData = lenderData.mostRecentEstimate;
         return Expanded(
-          child: lenderData.estimateUrl != null
-              ? TableHelper.buildEstimateBtn(onPressed: () {})
+          child: estimateData != null
+              ? TableHelper.buildEstimateBtn(onPressed: () async {
+                  final Uri url = Uri.parse(estimateData.estimateUrl);
+                  if (!await launchUrl(url)) {
+                    throw Exception(
+                        'Could not launch ${estimateData.estimateUrl}');
+                  }
+                })
               : Text("Awaiting Estimate",
                   style: TableHelper.getLenderNameStyle()),
         );
@@ -299,7 +336,8 @@ class TableHelper {
   static TextStyle getHeaderStyle() {
     return GoogleFonts.inter(
       fontSize: 14,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w400,
+      color: Color(0xff6A6A6A),
     );
   }
 

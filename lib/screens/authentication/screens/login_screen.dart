@@ -1,10 +1,12 @@
-import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/authentication/widgets/auth_text_button.dart';
 import 'package:approval_ai/widgets/custom_text_field.dart';
 import 'package:approval_ai/screens/authentication/widgets/header.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:approval_ai/controllers/auth_provider.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -44,8 +46,6 @@ class _LoginFormState extends State<LoginForm> {
   final FocusNode _emailFocusNode = FocusNode(); // FocusNode for email field
   final FocusNode _passwordFocusNode = FocusNode(); // FocusNode for passwor
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -70,23 +70,31 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _loginWithEmailAndPwd() async {
+    print("from login screen:login with email and pwd running");
     try {
-      final UserCredential userCredential =
-          await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      final firebase_auth.UserCredential userCredential = await context
+          .read<AuthProvider>()
+          .login(_emailController.text.trim(), _passwordController.text.trim());
+      print("from login screen: login with email and pwd finished");
+      if (!mounted) return;
+
       if (!userCredential.user!.emailVerified) {
-        Navigator.pushReplacementNamed(context, '/verifyemail');
+        context.push('/verifyemail');
+        return;
       }
-      var documentSnapshot = await FirebaseFunctions.getUserData();
-      if (documentSnapshot.data() != null) {
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+
+      final bool isOnboardingComplete =
+          await context.read<AuthProvider>().fetchOnboardingStatus();
+      print("from login screen: fetching onboarding status finished");
+      if (!mounted) return;
+      print("from login screen: isOnboardingComplete: $isOnboardingComplete");
+      if (isOnboardingComplete) {
+        context.go('/home');
       } else {
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/datacollection', (route) => false);
+        print("from login screen: i'm trying to push zero state home\n");
+        context.go('/zerostatehome');
       }
-    } on FirebaseAuthException catch (e) {
+    } on firebase_auth.FirebaseAuthException catch (e) {
       String errorMessage = '';
       if (e.code == 'user-not-found') {
         errorMessage = 'No user found for that email.';
@@ -103,60 +111,67 @@ class _LoginFormState extends State<LoginForm> {
 
   void _onPressForgotPwd() {
     // Navigate to forgot password screen :)
-    Navigator.pushNamed(context, '/forgotpwd');
+    context.go('/forgotpwd');
   }
 
   void _onPressSignup() {
-    Navigator.pushNamed(context, '/signup');
+    context.go('/signup');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // email text field
-          CustomTextField(
-            label: 'Email',
-            controller: _emailController,
-            focusNode: _emailFocusNode,
-            validator: (value) => _emailCheck(value),
-          ),
-          SizedBox(height: 32),
-          // password text field
-          CustomTextField(
-            label: 'Password',
-            obscureText: true,
-            controller: _passwordController,
-            focusNode: _passwordFocusNode,
-            validator: (value) => _passwordCheck(value),
-          ),
-          SizedBox(height: 40),
-          // sign_up_button
-          PrimaryCta(label: "Log In", onPressCb: _loginWithEmailAndPwd),
-          SizedBox(height: 48),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Container(
+      alignment: Alignment.center,
+      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
+      child: SizedBox(
+        width: 500,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AuthTextButton(
-                label: "Forgot your password?",
-                onPressedCb: _onPressForgotPwd,
+              // email text field
+              CustomTextField(
+                label: 'Email',
+                controller: _emailController,
+                focusNode: _emailFocusNode,
+                validator: (value) => _emailCheck(value),
               ),
-              SizedBox(height: 80),
-              Row(
+              SizedBox(height: 32),
+              // password text field
+              CustomTextField(
+                label: 'Password',
+                obscureText: true,
+                controller: _passwordController,
+                focusNode: _passwordFocusNode,
+                validator: (value) => _passwordCheck(value),
+              ),
+              SizedBox(height: 40),
+              // sign_up_button
+              PrimaryCta(label: "Log In", onPressCb: _loginWithEmailAndPwd),
+              SizedBox(height: 48),
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  AuthText(label: "Don't have an account?"),
                   AuthTextButton(
-                      label: "Sign up here", onPressedCb: _onPressSignup)
+                    label: "Forgot your password?",
+                    onPressedCb: _onPressForgotPwd,
+                  ),
+                  SizedBox(height: 80),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AuthText(label: "Don't have an account?"),
+                      AuthTextButton(
+                          label: "Sign up here", onPressedCb: _onPressSignup)
+                    ],
+                  )
                 ],
               )
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

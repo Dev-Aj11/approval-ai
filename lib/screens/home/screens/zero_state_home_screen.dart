@@ -1,18 +1,18 @@
 import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:approval_ai/controllers/auth_provider.dart';
 
 class ZeroStateHomeScreen extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  const ZeroStateHomeScreen({super.key});
 
-  ZeroStateHomeScreen({super.key});
-
-  Future<void> _onPressLogout(context) async {
+  Future<void> _onPressLogout(BuildContext context) async {
     try {
-      await _auth.signOut();
-      Navigator.pushNamed(context, '/login');
+      await context.read<AuthProvider>().logout();
+      context.go('/login');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign out failed: $e')),
@@ -20,8 +20,8 @@ class ZeroStateHomeScreen extends StatelessWidget {
     }
   }
 
-  _onPressGetStarted(context) {
-    Navigator.pushReplacementNamed(context, '/datacollection');
+  _onPressGetStarted(BuildContext context) {
+    context.push('/datacollection');
   }
 
   @override
@@ -41,7 +41,7 @@ class ZeroStateHomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildWelomceHeader(),
+              _buildWelomceHeader(context),
               SizedBox(height: 50),
               _buildSubHeading(context),
             ],
@@ -51,9 +51,9 @@ class ZeroStateHomeScreen extends StatelessWidget {
     );
   }
 
-  _buildWelomceHeader() {
+  _buildWelomceHeader(BuildContext context) {
     return Text(
-      "Welcome, Sam! 👋",
+      "Welcome! 👋",
       style: GoogleFonts.playfairDisplay(
           fontSize: 32, fontWeight: FontWeight.w600),
     );

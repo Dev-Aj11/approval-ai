@@ -10,8 +10,8 @@ class CustomSubHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: GoogleFonts.playfairDisplay(
-        fontSize: 24,
+      style: GoogleFonts.inter(
+        fontSize: 26,
         fontWeight: FontWeight.w700,
       ),
     );
@@ -29,9 +29,10 @@ class CustomLenerDetails extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon),
-        SizedBox(width: 6),
-        Text(lenderInfo),
+        Icon(icon, size: 18, color: Color(0xff6a6a6a)),
+        SizedBox(width: 4),
+        Text(lenderInfo,
+            style: GoogleFonts.inter(fontSize: 14, color: Color(0xff6a6a6a))),
       ],
     );
   }
@@ -45,8 +46,7 @@ class LenderHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       lenderName,
-      style: GoogleFonts.playfairDisplay(
-          fontSize: 24, fontWeight: FontWeight.bold),
+      style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w600),
     );
   }
 }
@@ -82,10 +82,11 @@ class LenderStatusBadge extends StatelessWidget {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: style.backgroundColor,
+        // border: Border.all(color: style.foregroundColor),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        style.lenderLabel,
+        "Lenders Contacted",
         textAlign: TextAlign.center,
         style: GoogleFonts.inter(
             color: style.foregroundColor,

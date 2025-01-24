@@ -7,7 +7,7 @@ class StepIndicator extends StatelessWidget {
   final int currentStep;
 
   const StepIndicator({
-    this.steps = const ['Overview', 'Loans', 'Lenders', 'Verification'],
+    this.steps = const ['Overview', 'Loans', 'Verification'],
     required this.currentStep,
     super.key,
   });

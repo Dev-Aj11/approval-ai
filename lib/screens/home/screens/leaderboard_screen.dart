@@ -14,12 +14,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   String selectedValue = "5 years";
   List<LoanEstimateData> bestLoanEstimates = [];
 
-  @override
-  void initState() {
-    super.initState();
-    getBestLoanEstimates();
-  }
-
   void onSelectFilter(newValue) {
     setState(() {
       selectedValue = newValue!;
@@ -41,6 +35,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    getBestLoanEstimates();
     int userSelectedLoanTerm = int.parse(selectedValue.split(" ")[0]);
     return Container(
       constraints: const BoxConstraints(maxWidth: 1100),
@@ -51,7 +46,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               selectedValue, onSelectFilter),
           SizedBox(height: 0),
           LeaderboardSections.buildLeaderboardSubheading(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           LeaderboardSections.buildLeaderboardTable(
               widget.loanEstimates, userSelectedLoanTerm),
         ],

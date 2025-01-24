@@ -4,6 +4,7 @@ import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_
 import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_helper.dart';
 import 'package:approval_ai/screens/home/widgets/metric_info.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LenderEstimateAnalysisExpansionTile extends StatefulWidget {
   final LoanEstimateData loanEstimate;
@@ -55,7 +56,7 @@ class _LenderEstimateAnalysisExpansionTileState
   Widget _buildHeader() {
     return ExpansionTileHelper.buildExpansionTileHeader(
       title: "Loan Estimate Analysis",
-      icon: Icons.attach_money,
+      icon: Icons.analytics_outlined,
     );
   }
 
@@ -89,7 +90,13 @@ class _LenderEstimateAnalysisExpansionTileState
         ExpansionTileButton(
           icon: Icons.open_in_new,
           label: "View Estimate",
-          onPress: () {},
+          onPress: () async {
+            final Uri url = Uri.parse(widget.loanEstimate.estimateUrl);
+            if (!await launchUrl(url)) {
+              throw Exception(
+                  'Could not launch ${widget.loanEstimate.estimateUrl}');
+            }
+          },
         ),
       ],
     );

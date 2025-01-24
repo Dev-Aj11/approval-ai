@@ -1,4 +1,3 @@
-import 'package:approval_ai/models/loan_estimate.dart';
 import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
@@ -57,7 +56,7 @@ class LeaderboardSections {
       List<LoanEstimateData> bestLoanEstimates, userSelectedLoanTerm) {
     final List<LenderLeaderboardMetric> rankings =
         List.generate(bestLoanEstimates.length, (index) {
-      String rankImage = _getImgPath(index);
+      // String rankImage = _getImgPath(index);
       String monthlyPayments =
           bestLoanEstimates[index].monthlyPaymentAndInterest.floor().toString();
       String totalPayments = bestLoanEstimates[index]
@@ -66,8 +65,8 @@ class LeaderboardSections {
           .toString();
 
       return LenderLeaderboardMetric(
-        rankImage: rankImage,
-        name: "US BANK", //bestLoanEstimates[index].lenderName,
+        rank: index + 1,
+        name: bestLoanEstimates[index].lenderName,
         monthlyPayments: "\$$monthlyPayments",
         totalPayments: "\$$totalPayments",
       );
@@ -87,9 +86,9 @@ class LeaderboardSections {
 
   static String _getImgPath(index) {
     if (index == 0) {
-      return "assets/img/rank_1.png";
+      return "1";
     } else if (index == 1) {
-      return "assets/img/rank_2.png";
+      return "2";
     }
     return "assets/img/rank_3.png";
   }
@@ -108,12 +107,15 @@ class DesktopLeaderboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildHeader(),
-        ...rankings.map((ranking) => _buildRow(ranking, context)),
-      ],
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 48),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          ...rankings.map((ranking) => _buildRow(ranking, context)),
+        ],
+      ),
     );
   }
 
@@ -164,51 +166,72 @@ class MobileLeaderboard extends StatelessWidget {
 
   Widget _buildLenderCard(ranking) {
     return Container(
-      width: 300,
+      width: 350,
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Color(0xffD9D9D9),
-          width: 1,
-        ),
+        color: Colors.white, //Color(0xffF7FAFF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Color(0xffDddddd)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
+          Row(
             children: [
-              RankImage(imagePath: ranking.rankImage),
-              SizedBox(width: 20),
+              Text(ranking.rank.toString(),
+                  style: GoogleFonts.inter(
+                      fontSize: 16, fontWeight: FontWeight.w500)),
+              SizedBox(width: 8),
               Text(
                 ranking.name,
-                style: GoogleFonts.playfairDisplay(
-                    fontSize: 24, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(
+                    fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Wrap(
             children: [
               MetricInfo(
                 data: _formatMoney(ranking.monthlyPayments),
                 metricName: "Monthly Payment",
-                centerData: true,
+                // centerData: true,
               ),
-              SizedBox(width: 20),
+              SizedBox(width: 32),
               MetricInfo(
                 data: _formatMoney(ranking.totalPayments),
                 metricName: "Total Payments",
-                centerData: true,
               )
             ],
           ),
           SizedBox(height: 32),
-          ExpansionTileButton(
-            label: "Connect",
-            icon: Icons.message_outlined,
-            onPress: () {},
+          Container(
+            width: 120,
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              style: TableHelper.getButtonStyle(),
+              onPressed: () {},
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text("Get connected",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.black)),
+                  const SizedBox(width: 1),
+                  Transform.translate(
+                    offset: const Offset(0, 3),
+                    child: const Icon(
+                      Icons.chevron_right,
+                      size: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

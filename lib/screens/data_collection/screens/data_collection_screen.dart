@@ -1,12 +1,15 @@
 import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/data_collection/model/user_data_model.dart';
-import 'package:approval_ai/screens/data_collection/screens/lenders_details_form.dart';
 import 'package:approval_ai/screens/data_collection/screens/loan_type_details_form.dart';
 import 'package:approval_ai/screens/data_collection/screens/user_data_form.dart';
 import 'package:approval_ai/screens/data_collection/screens/verification_details_form.dart';
 import 'package:approval_ai/screens/data_collection/widgets/step_indicator.dart';
+import 'package:approval_ai/screens/how_it_works/screens/how_it_works.dart';
 import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:approval_ai/controllers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class DataCollectionScreen extends StatefulWidget {
   const DataCollectionScreen({super.key});
@@ -19,24 +22,25 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   int currentStep = 0;
   Map<String, dynamic> userInfoAndPreferences = {};
 
-  Widget _buildCustomForm() {
+  Widget _buildCustomForm(context) {
     switch (currentStep) {
       case 0:
         return UserDataForm(
-            onComplete: (UserData userData) => onUserDataComplete(userData));
+            onComplete: (UserData userData) =>
+                onUserDataComplete(userData, context));
       case 1:
         return LoanTypeDetailsForm(
             onComplete: (LoanPreference loanData) =>
-                onLoanTypeComplete(loanData));
+                onLoanTypeComplete(loanData, context));
+      // case 2:
+      //   return LenderDetailsForm(
+      //     onComplete: (LenderPreference lenderData) =>
+      //         onLenderTypeComplete(lenderData),
+      //   );
       case 2:
-        return LenderDetailsForm(
-          onComplete: (LenderPreference lenderData) =>
-              onLenderTypeComplete(lenderData),
-        );
-      case 3:
         return VerificationDetailsForm(
             onComplete: (acceptedTerms) =>
-                onVerificationComplete(acceptedTerms));
+                onVerificationComplete(acceptedTerms, context));
       default:
         return Placeholder();
     }
@@ -48,42 +52,51 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
         ButtonConfig(
           label: "Cancel",
           onPress: () {
-            Navigator.pushReplacementNamed(context, '/zerostatehome');
+            context.go('/zerostatehome');
           },
         ),
       ],
     );
   }
 
-  void updateStep() {
+  void updateStep(BuildContext context) {
     setState(() {
-      if (currentStep < 3) {
+      if (currentStep < 2) {
         currentStep = currentStep + 1;
       } else {
         FirebaseFunctions.addUserDetails({'userData': userInfoAndPreferences});
-        Navigator.pushReplacementNamed(context, '/home');
+        context.read<AuthProvider>().setOnboardingComplete(true);
+        context.go('/home');
+        // show dialog after navigating to home page
+        Future.delayed(Duration(milliseconds: 100), () {
+          showDialog(
+            context: context,
+            builder: (context) => const HowItWorksScreen(),
+            barrierDismissible: false,
+          );
+        });
       }
     });
   }
 
-  void onUserDataComplete(UserData userData) {
+  void onUserDataComplete(UserData userData, context) {
     userInfoAndPreferences["personalInfo"] = userData.toJson();
-    updateStep();
+    updateStep(context);
   }
 
-  void onLoanTypeComplete(LoanPreference loanTypeData) {
+  void onLoanTypeComplete(LoanPreference loanTypeData, context) {
     userInfoAndPreferences["loanPreference"] = loanTypeData.toJson();
-    updateStep();
+    updateStep(context);
   }
 
-  void onLenderTypeComplete(LenderPreference lenderTypeData) {
-    userInfoAndPreferences["lenderPreference"] = lenderTypeData.toJson();
-    updateStep();
-  }
+  // void onLenderTypeComplete(LenderPreference lenderTypeData) {
+  //   userInfoAndPreferences["lenderPreference"] = lenderTypeData.toJson();
+  //   updateStep();
+  // }
 
-  void onVerificationComplete(acceptedTerms) {
+  void onVerificationComplete(acceptedTerms, context) {
     userInfoAndPreferences["acceptedTerms"] = acceptedTerms;
-    updateStep();
+    updateStep(context);
   }
 
   @override
@@ -101,7 +114,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                 children: [
                   StepIndicator(currentStep: currentStep),
                   SizedBox(height: 43),
-                  _buildCustomForm()
+                  _buildCustomForm(context)
                 ],
               ),
             ),

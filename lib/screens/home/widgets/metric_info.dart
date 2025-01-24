@@ -30,8 +30,8 @@ class MetricInfo extends StatelessWidget {
         Text(
           isMoney ? _formatMoney(data) : data,
           style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
           ),
         ),
         Text(

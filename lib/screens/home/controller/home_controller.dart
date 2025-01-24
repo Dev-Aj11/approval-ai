@@ -2,12 +2,16 @@ import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:approval_ai/screens/home/model/lender_data.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui;
 import 'package:flutter/material.dart';
+import 'package:approval_ai/controllers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class HomeController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
   Map<LenderStatusEnum, int> lenderStatusCount = {
     LenderStatusEnum.contacted: 0,
     LenderStatusEnum.received: 0,
@@ -31,18 +35,31 @@ class HomeController {
         recentLoanEstimates.add(lenderDataItem.estimateData![0]);
       }
     }
-
     return recentLoanEstimates;
   }
 
-  Future<void> signOut(context) async {
+  // provide BuildContext to sign out
+  Future<void> signOut(BuildContext context) async {
     try {
-      await _auth.signOut();
-      Navigator.pushNamed(context, '/login');
+      await context.read<AuthProvider>().logout().then((value) {
+        context.go('/login');
+      });
     } catch (e) {
+      print('Error during logout: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign out failed: $e')),
       );
+    }
+  }
+
+  Future<String> getUserFirstName() async {
+    try {
+      final documentSnapshotOnUsers = await FirebaseFunctions.getUserData();
+      final userInfo = documentSnapshotOnUsers.data() as Map<String, dynamic>;
+      final firstName = userInfo["userData"]["personalInfo"]["firstName"];
+      return firstName;
+    } catch (e) {
+      return "";
     }
   }
 
@@ -60,16 +77,17 @@ class HomeController {
       final updatedLenderData =
           querySnapshotOnLenders.docs.map((lenderDataDoc) {
         final lenderInfo = lenderDataDoc.data() as Map<String, dynamic>;
-        final loanOfficerInfo =
-            lenderInfo['loanOfficer'] as Map<String, dynamic>;
-        final lenderName = lenderInfo['name'];
+        final loanOfficers = lenderInfo['loanOfficer'];
+        final loanOfficerInfo = loanOfficers.first;
+        final loanOfficerName =
+            "${loanOfficerInfo['firstName']} ${loanOfficerInfo['lastName']}";
 
         // return lender data class
         return LenderData(
-          name: lenderName,
+          name: lenderInfo['name'],
           type: lenderInfo['bankType'],
           logoUrl: lenderInfo['logoUrl'],
-          loanOfficer: loanOfficerInfo.keys.first,
+          loanOfficer: loanOfficerName,
           currStatus: _getLenderStatus(userLenderStatusInfo[lenderDataDoc.id]),
           estimateData:
               _buildEstimateData(userLenderStatusInfo[lenderDataDoc.id]),
@@ -84,79 +102,102 @@ class HomeController {
     }
   }
 
-  List<MessageData> _buildLenderMessages(userLenderStatusInfo) {
-    final messages = userLenderStatusInfo['messages'];
-    final List<MessageData> messageList = [];
-    // messages.entries gives you a map with all key-value pairs in the map
-    for (var message in messages.entries) {
-      messageList.add(
-        MessageData(
-          content: message.value['content'],
-          timestamp: message.value['timestamp'].toDate(),
-          isFromAgent: message.value['isFromAgent'],
-          mode: message.value['mode'],
-        ),
-      );
+  List<MessageData>? _buildLenderMessages(userLenderStatusInfo) {
+    try {
+      if (userLenderStatusInfo['messages'] == null) {
+        return null;
+      }
+      final messages = userLenderStatusInfo['messages'];
+      final List<MessageData> messageList = [];
+      // messages.entries gives you a map with all key-value pairs in the map
+      for (var message in messages.entries) {
+        messageList.add(
+          MessageData(
+            content: message.value['content'],
+            timestamp: message.value['timestamp'].toDate(),
+            isFromAgent: message.value['isFromAgent'],
+            mode: message.value['mode'],
+          ),
+        );
+      }
+      return messageList;
+    } catch (e) {
+      print("Error getting lender messages: $e");
+      return [];
     }
-    return messageList;
   }
 
   List<LenderStatusEnum> _getLenderStatus(userLenderStatusInfo) {
-    final lenderStatus = userLenderStatusInfo['status'];
+    try {
+      final lenderStatus = userLenderStatusInfo['status'];
 
-    List<LenderStatusEnum> lenderStatusList = [];
-    if (lenderStatus['contacted'] == true) {
-      var contacted = LenderStatusEnum.contacted;
-      lenderStatusCount[contacted] = lenderStatusCount[contacted]! + 1;
-      lenderStatusList.add(contacted);
+      List<LenderStatusEnum> lenderStatusList = [];
+      if (lenderStatus['contacted'] == true) {
+        var contacted = LenderStatusEnum.contacted;
+        lenderStatusCount[contacted] = lenderStatusCount[contacted]! + 1;
+        lenderStatusList.add(contacted);
+      }
+      if (lenderStatus['estimateReceived'] == true) {
+        var received = LenderStatusEnum.received;
+        lenderStatusCount[received] = lenderStatusCount[received]! + 1;
+        lenderStatusList.add(received);
+      }
+      if (lenderStatus['negotiationInProgress'] == true) {
+        var negotiating = LenderStatusEnum.negotiating;
+        lenderStatusCount[negotiating] = lenderStatusCount[negotiating]! + 1;
+        lenderStatusList.add(negotiating);
+      }
+      if (lenderStatus['negotiationComplete'] == true) {
+        var complete = LenderStatusEnum.complete;
+        lenderStatusCount[complete] = lenderStatusCount[complete]! + 1;
+        lenderStatusList.add(complete);
+      }
+      return lenderStatusList;
+    } catch (e) {
+      print("Error getting lender status: $e");
+      return [];
     }
-    if (lenderStatus['estimateReceived'] == true) {
-      var received = LenderStatusEnum.received;
-      lenderStatusCount[received] = lenderStatusCount[received]! + 1;
-      lenderStatusList.add(received);
-    }
-    if (lenderStatus['negotiationInProgress'] == true) {
-      var negotiating = LenderStatusEnum.negotiating;
-      lenderStatusCount[negotiating] = lenderStatusCount[negotiating]! + 1;
-      lenderStatusList.add(negotiating);
-    }
-    if (lenderStatus['negotiationComplete'] == true) {
-      var complete = LenderStatusEnum.complete;
-      lenderStatusCount[complete] = lenderStatusCount[complete]! + 1;
-      lenderStatusList.add(complete);
-    }
-    return lenderStatusList;
   }
 
-  List<LoanEstimateData> _buildEstimateData(userLenderStatusInfo) {
-    List<LoanEstimateData> estimateDataItems = [];
-    final estimateData = userLenderStatusInfo['estimateData'];
-    for (var estimateDataItem in estimateData) {
-      final closingCosts =
-          _getClosingCosts(estimateDataItem['closingCosts']) as ClosingCosts;
+  List<LoanEstimateData>? _buildEstimateData(userLenderStatusInfo) {
+    try {
+      List<LoanEstimateData> estimateDataItems = [];
+      if (userLenderStatusInfo['estimateData'] == null) {
+        return null;
+      }
+      final estimateData =
+          userLenderStatusInfo['estimateData'] as List<dynamic>;
 
-      final monthlyPaymentRange =
-          _getMonthlyPaymentRange(estimateDataItem['monthlyPaymentRange']);
-      final comparisons = _getComparisons(estimateDataItem['comparisons']);
-      final loanDetails = _getLoanDetails(estimateDataItem['loanDetails']);
+      for (var estimateDataItem in estimateData) {
+        final closingCosts =
+            _getClosingCosts(estimateDataItem['closingCosts']) as ClosingCosts;
 
-      estimateDataItems.add(
-        LoanEstimateData(
-          lenderName: estimateDataItem['lenderName'],
-          estimateUrl: estimateDataItem['estimateUrl'],
-          balloonPayment: estimateDataItem['balloonPayment'],
-          prepaymentPenalty: estimateDataItem['prepaymentPenalty'],
-          monthlyPaymentAndInterest:
-              estimateDataItem['monthlyPaymentAndInterest'],
-          timestamp: estimateDataItem['timestamp'],
-          monthlyPaymentRange: monthlyPaymentRange,
-          closingCosts: closingCosts,
-          comparisons: comparisons, // estimateData['comparisons'],
-          loanDetails: loanDetails, //estimateData['loanDetails'],
-        ),
-      );
+        final monthlyPaymentRange =
+            _getMonthlyPaymentRange(estimateDataItem['monthlyPaymentRange']);
+        final comparisons = _getComparisons(estimateDataItem['comparisons']);
+        final loanDetails = _getLoanDetails(estimateDataItem['loanDetails']);
+
+        estimateDataItems.add(
+          LoanEstimateData(
+            lenderName: estimateDataItem['lenderName'],
+            estimateUrl: estimateDataItem['estimateUrl'],
+            balloonPayment: estimateDataItem['balloonPayment'],
+            prepaymentPenalty: estimateDataItem['prepaymentPenalty'],
+            monthlyPaymentAndInterest:
+                estimateDataItem['monthlyPaymentAndInterest'],
+            timestamp: estimateDataItem['timestamp'],
+            monthlyPaymentRange: monthlyPaymentRange,
+            closingCosts: closingCosts,
+            comparisons: comparisons, // estimateData['comparisons'],
+            loanDetails: loanDetails, //estimateData['loanDetails'],
+          ),
+        );
+      }
+      return estimateDataItems;
+    } catch (e) {
+      print("Error getting estimate data: $e");
+      return null;
     }
-    return estimateDataItems;
   }
 
   _getLoanDetails(loanDetails) {

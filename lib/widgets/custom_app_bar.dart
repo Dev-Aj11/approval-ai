@@ -10,8 +10,13 @@ class ButtonConfig {
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<ButtonConfig> buttons;
+  final Widget? leading;
 
-  const CustomAppBar({required this.buttons, super.key});
+  const CustomAppBar({
+    Key? key,
+    required this.buttons,
+    this.leading,
+  }) : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(60);

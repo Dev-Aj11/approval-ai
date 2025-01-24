@@ -1,20 +1,23 @@
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/authentication/widgets/header.dart';
+import 'package:go_router/go_router.dart';
 
 class VerifyEmailScreen extends StatelessWidget {
   const VerifyEmailScreen({super.key});
 
-  void _onPressBackToLogin(context) {
-    Navigator.pushReplacementNamed(context, '/login');
+  void _onPressBackToLogin(BuildContext context) {
+    context.push('/login');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
         child: SizedBox(
-          width: 500,
+          width: 400,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

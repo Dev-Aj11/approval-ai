@@ -1,12 +1,13 @@
 import 'package:approval_ai/widgets/primary_cta.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/authentication/widgets/header.dart';
+import 'package:go_router/go_router.dart';
 
 class ResetSuccessfulScreen extends StatelessWidget {
   const ResetSuccessfulScreen({super.key});
 
-  void _onPressBackToLogin(context) {
-    Navigator.pushReplacementNamed(context, '/login');
+  void _onPressBackToLogin(BuildContext context) {
+    context.go('/login');
   }
 
   @override
@@ -14,7 +15,7 @@ class ResetSuccessfulScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: SizedBox(
-          width: 500,
+          width: 400,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

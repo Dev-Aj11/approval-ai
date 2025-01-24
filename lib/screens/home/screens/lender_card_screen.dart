@@ -15,11 +15,13 @@ class LenderCardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: _getLenderCardStyle(),
+      width: 1100,
       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 24),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
           _buildLenderTitleRow(),
+          SizedBox(height: 12),
           _buildMetricsExpansionTiles(),
         ],
       ),
@@ -31,7 +33,7 @@ class LenderCardScreen extends StatelessWidget {
       color: Colors.white,
       borderRadius: BorderRadius.circular(8),
       border: Border.all(
-        color: Color(0xffD9D9D9),
+        color: Color(0xffDDDDDD),
         width: 1,
       ),
     );
@@ -47,7 +49,8 @@ class LenderCardScreen extends StatelessWidget {
   }
 
   _buildMessagesExpansionTile() {
-    bool messagesExist = lenderData.messages.isNotEmpty;
+    bool messagesExist =
+        lenderData.messages != null && lenderData.messages!.isNotEmpty;
     if (!messagesExist) {
       return SizedBox();
     }
@@ -69,7 +72,7 @@ class LenderCardScreen extends StatelessWidget {
         loanEstimate: mostRecentEstimate!,
       );
     }
-    return null;
+    return SizedBox.shrink();
   }
 
   _buildLenderNegotiationAnalysisExpansionTile() {
@@ -87,7 +90,7 @@ class LenderCardScreen extends StatelessWidget {
         );
       }
     }
-    return null;
+    return SizedBox.shrink();
   }
 
   _buildLenderTitleRow() {

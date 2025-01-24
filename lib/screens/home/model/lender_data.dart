@@ -14,10 +14,9 @@ class LenderData {
   final String type;
   final String logoUrl;
   final String loanOfficer;
-  final List<MessageData> messages;
   final List<LenderStatusEnum> currStatus;
+  final List<MessageData>? messages;
   final List<LoanEstimateData>? estimateData;
-  final String? estimateUrl;
 
   LenderData({
     required this.name,
@@ -25,8 +24,7 @@ class LenderData {
     required this.logoUrl,
     required this.loanOfficer,
     required this.currStatus,
-    required this.messages,
-    this.estimateUrl,
+    this.messages,
     this.estimateData,
   }) {
     if (estimateData != null) {
@@ -55,9 +53,11 @@ class LenderData {
   // Convenience getters
   int get emailsExchanged {
     int emailsExchanged = 0;
-    for (var message in messages) {
-      if (message.mode == "email") {
-        emailsExchanged++;
+    if (messages != null) {
+      for (var message in messages!) {
+        if (message.mode == "email") {
+          emailsExchanged++;
+        }
       }
     }
     return emailsExchanged;
@@ -65,9 +65,11 @@ class LenderData {
 
   int get textsExchanged {
     int textsExchanged = 0;
-    for (var message in messages) {
-      if (message.mode == "text") {
-        textsExchanged++;
+    if (messages != null) {
+      for (var message in messages!) {
+        if (message.mode == "text") {
+          textsExchanged++;
+        }
       }
     }
     return textsExchanged;
@@ -75,9 +77,11 @@ class LenderData {
 
   int get phoneCallsExchanged {
     int phoneCalls = 0;
-    for (var message in messages) {
-      if (message.mode == "phone") {
-        phoneCalls++;
+    if (messages != null) {
+      for (var message in messages!) {
+        if (message.mode == "phone") {
+          phoneCalls++;
+        }
       }
     }
     return phoneCalls;
@@ -148,13 +152,13 @@ class LenderExpansionTileMetric {
 }
 
 class LenderLeaderboardMetric {
-  final String rankImage;
+  final int rank;
   final String name;
   final String monthlyPayments;
   final String totalPayments;
 
   const LenderLeaderboardMetric({
-    required this.rankImage,
+    required this.rank,
     required this.name,
     required this.monthlyPayments,
     required this.totalPayments,

@@ -24,7 +24,7 @@ final Map<LenderStatusEnum, MetricStyle> kMetricStyles = {
   LenderStatusEnum.contacted: MetricStyle(
       backgroundColor: Color(0xffE8F3FE),
       foregroundColor: Color(0xff198AF4),
-      icon: Icons.phone,
+      icon: Icons.phone_outlined,
       iconLabel: "Lenders Contacted",
       lenderLabel: "Lender Contacted"),
   LenderStatusEnum.received: MetricStyle(
@@ -49,34 +49,29 @@ final Map<LenderStatusEnum, MetricStyle> kMetricStyles = {
   ),
 };
 
-class MetricData {
-  final LenderStatusEnum type;
-  static const double _iconSize = 54.0;
-  static const double _iconInnerSize = 24.0;
+class OverviewMetricCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
 
-  const MetricData({required this.type});
+  const OverviewMetricCard({
+    required this.icon,
+    required this.label,
+    super.key,
+  });
 
-  String getMetricName() => kMetricStyles[type]!.iconLabel;
-
-  Widget buildMetricIcon() {
-    final style = kMetricStyles[type]!;
-
-    return Container(
-      width: _iconSize,
-      height: _iconSize,
-      decoration: BoxDecoration(
-        color: style.backgroundColor,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        style.icon,
-        color: style.foregroundColor,
-        size: _iconInnerSize,
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 20),
+        SizedBox(width: 8),
+        Text(label),
+      ],
     );
   }
 }
 
+/*
 // Map of metric types to their data
 const Map<LenderStatusEnum, MetricData> kMetricInfo = {
   LenderStatusEnum.contacted: MetricData(type: LenderStatusEnum.contacted),
@@ -84,3 +79,4 @@ const Map<LenderStatusEnum, MetricData> kMetricInfo = {
   LenderStatusEnum.negotiating: MetricData(type: LenderStatusEnum.negotiating),
   LenderStatusEnum.complete: MetricData(type: LenderStatusEnum.complete),
 };
+*/

@@ -5,12 +5,12 @@ import 'package:approval_ai/screens/home/widgets/metric_info.dart';
 import 'package:flutter/material.dart';
 
 class LenderMessagesExpansionTile extends StatelessWidget {
-  final List<MessageData> lenderMessages;
+  final List<MessageData>? lenderMessages;
   final int emailsExchanged;
   final int phoneCallsExchanged;
   final int textsExchanged;
   const LenderMessagesExpansionTile(
-      {required this.lenderMessages,
+      {this.lenderMessages,
       required this.emailsExchanged,
       required this.phoneCallsExchanged,
       required this.textsExchanged,

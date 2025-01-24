@@ -8,11 +8,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 
 class HomeScreenSections {
-  static Widget buildWelcomeHeader() {
-    return Text(
-      "Welcome, Sam! 👋",
-      style: GoogleFonts.playfairDisplay(
-          fontSize: 48, fontWeight: FontWeight.w600),
+  static Widget buildWelcomeHeader(String firstName) {
+    return Container(
+      width: 1100,
+      alignment: Alignment.centerLeft,
+      child: Text(
+        "Welcome, $firstName!",
+        style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w600),
+      ),
     );
   }
 
@@ -39,32 +42,39 @@ class HomeScreenSections {
 
   static Widget buildOverviewStats(
       Map<LenderStatusEnum, int> lenderStatusCount) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CustomSubHeading(label: "Overview"),
-        SizedBox(height: 8),
-        Text(
-          constructUpdateStr(lenderStatusCount),
-          style: TableHelper.getRowStyle(),
-        ),
-        SizedBox(height: 16),
-        Wrap(
-          spacing: 24.0,
-          runSpacing: 16,
-          children: List.generate(
-            LenderStatusEnum.values.length,
-            (index) {
-              var metricName = LenderStatusEnum.values[index];
-              return CustomOverviewCard(
-                metricData:
-                    lenderStatusCount[metricName]!.toString(), // 4, 3, 2, 1
-                metricType: metricName,
-              );
-            },
+    return Container(
+      width: 1100,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomSubHeading(label: "Overview"),
+          SizedBox(height: 8),
+          Text(
+            constructUpdateStr(lenderStatusCount),
+            style: TableHelper.getRowStyle(),
           ),
-        ),
-      ],
+          SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            child: Wrap(
+              spacing: 24,
+              runSpacing: 24,
+              // alignment: WrapAlignment.spaceBetween,
+              children: List.generate(
+                LenderStatusEnum.values.length,
+                (index) {
+                  var metricName = LenderStatusEnum.values[index];
+                  return CustomOverviewCard(
+                    metricData:
+                        lenderStatusCount[metricName]!.toString(), // 4, 3, 2, 1
+                    metricType: metricName,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -82,10 +92,10 @@ class HomeScreenSections {
           "We are sweet-talking lenders over phone and emails. Here's the latest scoop...",
           style: TableHelper.getRowStyle(),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 24),
         ...lenderData.map(
           (lenderData) => Padding(
-            padding: const EdgeInsets.only(bottom: 24),
+            padding: const EdgeInsets.only(bottom: 32),
             child: LenderCardScreen(lenderData: lenderData),
           ),
         ),
