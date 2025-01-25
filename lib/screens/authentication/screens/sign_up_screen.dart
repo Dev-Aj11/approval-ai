@@ -111,44 +111,49 @@ class _SignUpFormState extends State<SignUpForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // email text field
-          CustomTextField(
-            label: 'Email',
-            focusNode: _emailFocusNode,
-            controller: _emailController,
-            validator: (value) => _emailCheck(value),
-          ),
-          SizedBox(height: 32),
-          // password text field
-          CustomTextField(
-            label: 'Password',
-            focusNode: _passwordFocusNode,
-            obscureText: true,
-            controller: _passwordController,
-            validator: (value) => _passwordCheck(value),
-          ),
-          SizedBox(height: 40),
-          // sign_up_button
-          PrimaryCta(
-            label: "Sign Up",
-            onPressCb: _signUpWithEmailAndPwd,
-          ),
-          SizedBox(height: 48),
-          // Provide option to login
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AuthText(label: "Already have an account?"),
-              AuthTextButton(
-                onPressedCb: _onPressLoginHere,
-                label: "Log in here",
-              ),
-            ],
-          ),
-        ],
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
+        width: 500,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // email text field
+            CustomTextField(
+              label: 'Email',
+              focusNode: _emailFocusNode,
+              controller: _emailController,
+              validator: (value) => _emailCheck(value),
+            ),
+            SizedBox(height: 32),
+            // password text field
+            CustomTextField(
+              label: 'Password',
+              focusNode: _passwordFocusNode,
+              obscureText: true,
+              controller: _passwordController,
+              validator: (value) => _passwordCheck(value),
+            ),
+            SizedBox(height: 40),
+            // sign_up_button
+            PrimaryCta(
+              label: "Sign Up",
+              onPressCb: _signUpWithEmailAndPwd,
+            ),
+            SizedBox(height: 48),
+            // Provide option to login
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AuthText(label: "Already have an account?"),
+                AuthTextButton(
+                  onPressedCb: _onPressLoginHere,
+                  label: "Log in here",
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:approval_ai/screens/agent_interactions/screens/messages_screen.d
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
 import 'package:approval_ai/screens/home/widgets/styles.dart';
+import 'package:approval_ai/widgets/buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -133,29 +134,9 @@ class TableHelper {
       case '':
         return Expanded(
           flex: 1,
-          child: TextButton(
-            style: TableHelper.getButtonStyle(),
+          child: SecondaryTextButton(
+            label: "Get connected",
             onPressed: () {},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text("Get Connected",
-                    style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.black)),
-                const SizedBox(width: 2),
-                Transform.translate(
-                  offset: const Offset(0, 3),
-                  child: const Icon(
-                    Icons.chevron_right,
-                    size: 14,
-                  ),
-                ),
-              ],
-            ),
           ),
         );
       default:
@@ -262,27 +243,9 @@ class TableHelper {
   /// Creates a preview button with customizable onPressed behavior
   static Widget buildPreviewBtn({
     required VoidCallback onPressed,
-    String label = 'View Message',
+    String label = 'View',
   }) {
-    return TextButton(
-      style: getButtonStyle(),
-      onPressed: onPressed,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
-        children: [
-          Text(label),
-          Transform.translate(
-            offset: const Offset(0, 5),
-            child: const Icon(
-              Icons.chevron_right,
-              size: 18,
-            ),
-          ),
-        ],
-      ),
-    );
+    return SecondaryTextButton(label: label, onPressed: onPressed);
   }
 
   /// Creates an estimate button with customizable onPressed behavior

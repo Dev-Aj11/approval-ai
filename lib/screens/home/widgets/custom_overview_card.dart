@@ -1,13 +1,19 @@
 import 'package:approval_ai/screens/home/model/overview_data.dart';
+import 'package:approval_ai/widgets/buttons.dart';
 import 'package:approval_ai/widgets/table_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:approval_ai/screens/home/controller/home_controller.dart';
 
 class CustomOverviewCard extends StatelessWidget {
   final String metricData;
   final LenderStatusEnum metricType;
+  final HomeController controller;
+
   const CustomOverviewCard({
     required this.metricData,
+    required this.controller,
     required this.metricType,
     super.key,
   });
@@ -68,34 +74,38 @@ class CustomOverviewCard extends StatelessWidget {
           ),
           // cta
           SizedBox(height: 24),
-          Container(
-            width: 60,
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              style: TableHelper.getButtonStyle(),
-              onPressed: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text("View",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.black)),
-                  const SizedBox(width: 1),
-                  Transform.translate(
-                    offset: const Offset(0, 3),
-                    child: const Icon(
-                      Icons.chevron_right,
-                      size: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          SecondaryTextButton(
+            label: "View",
+            onPressed: () => controller.setCurrentPage("Messages"),
           ),
+          // Container(
+          //   width: 60,
+          //   alignment: Alignment.centerLeft,
+          //   child: TextButton(
+          //     style: TableHelper.getButtonStyle(),
+          //     onPressed: () => controller.setCurrentPage("Messages"),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       mainAxisSize: MainAxisSize.min,
+          //       crossAxisAlignment: CrossAxisAlignment.baseline,
+          //       textBaseline: TextBaseline.alphabetic,
+          //       children: [
+          //         Text("View",
+          //             style: TextStyle(
+          //                 decoration: TextDecoration.underline,
+          //                 decorationColor: Colors.black)),
+          //         const SizedBox(width: 1),
+          //         Transform.translate(
+          //           offset: const Offset(0, 3),
+          //           child: const Icon(
+          //             Icons.chevron_right,
+          //             size: 14,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

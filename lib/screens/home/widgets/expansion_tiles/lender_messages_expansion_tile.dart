@@ -1,19 +1,23 @@
 import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
+import 'package:approval_ai/screens/home/controller/home_controller.dart';
 import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_button.dart';
 import 'package:approval_ai/screens/home/widgets/expansion_tiles/expansion_tile_helper.dart';
 import 'package:approval_ai/screens/home/widgets/metric_info.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LenderMessagesExpansionTile extends StatelessWidget {
   final List<MessageData>? lenderMessages;
   final int emailsExchanged;
   final int phoneCallsExchanged;
   final int textsExchanged;
+  // final HomeController controller;
   const LenderMessagesExpansionTile(
       {this.lenderMessages,
       required this.emailsExchanged,
       required this.phoneCallsExchanged,
       required this.textsExchanged,
+      // required this.controller,
       super.key});
 
   @override
@@ -51,17 +55,24 @@ class LenderMessagesExpansionTile extends StatelessWidget {
   }
 
   Widget _buildButonRow() {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: [
-        ExpansionTileButton(
-          icon: Icons.download,
-          label: "Download Messages",
-          onPress: () {},
-        )
-      ],
-    );
+    // this is a consumer that listens to the home controller
+    // it gets access to the controller and can call its methods
+    // this prevents the need to pass the controller around as a parameter from parent widgets
+    return Consumer<HomeController>(builder: (context, controller, child) {
+      return Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        children: [
+          ExpansionTileButton(
+            icon: Icons.open_in_new,
+            label: "View Messages",
+            onPress: () {
+              controller.setCurrentPage("Messages");
+            },
+          )
+        ],
+      );
+    });
   }
 
   Widget _buildMetrics() {

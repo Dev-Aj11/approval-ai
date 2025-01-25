@@ -1,23 +1,32 @@
+import 'package:approval_ai/controllers/ssn_encryption.dart';
 import 'package:approval_ai/firebase_functions.dart';
 import 'package:approval_ai/screens/agent_interactions/model/interaction_data.dart';
 import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/overview_data.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:encrypt/encrypt.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart' as firebase_ui;
 import 'package:flutter/material.dart';
 import 'package:approval_ai/controllers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class HomeController {
-  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
+class HomeController extends ChangeNotifier {
   Map<LenderStatusEnum, int> lenderStatusCount = {
     LenderStatusEnum.contacted: 0,
     LenderStatusEnum.received: 0,
     LenderStatusEnum.negotiating: 0,
     LenderStatusEnum.complete: 0,
   };
+
+  String _currentPage = "Home";
+  String get currentPage => _currentPage;
+
+  void setCurrentPage(String page) {
+    _currentPage = page;
+    // this notifies the listener in home_screen.dart to rebuild everything
+    // inside the ListenableBuilder
+    notifyListeners();
+  }
 
   List<LoanEstimateData> getRecentLoanEstimatesForEachLender(lenderDataItems) {
     List<LoanEstimateData> recentLoanEstimates = [];
@@ -69,7 +78,19 @@ class HomeController {
       final documentSnapshotOnUsers = await FirebaseFunctions.getUserData();
       final userInfo = documentSnapshotOnUsers.data() as Map<String, dynamic>;
       final userLenderStatusInfo = userInfo["lenderData"];
+      final encryptedBase64 = userInfo['userData']['personalInfo']['ssn'];
 
+      try {
+        final encrypted = Encrypted.fromBase64(encryptedBase64);
+        final ssn = SSNEncryption.decryptSSN(encrypted);
+
+        // SSN Encryption.testEncryptDecrypt() is working as expected
+        // hmm this is not working as expected; unable to decrypt ssn
+        print('Decrypted SSN: $ssn');
+      } catch (e) {
+        print('Detailed decryption error: $e');
+        // Continue with the rest of the function even if SSN decryption fails
+      }
       // get lender metada (lender name, type, logo, loan officer)
       final querySnapshotOnLenders = await FirebaseFunctions.getLenderDetails();
 

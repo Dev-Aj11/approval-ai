@@ -1,5 +1,4 @@
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
+import 'package:approval_ai/controllers/ssn_encryption.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,6 +9,11 @@ class FirebaseFunctions {
   // add new user to firebase
   static Future<void> addUserDetails(
       Map<String, dynamic> userInfoAndPreferences) async {
+    print(userInfoAndPreferences);
+    // encrypt ssn from userdata
+    final ssn = userInfoAndPreferences['userData']['personalInfo']['ssn'];
+    final encryptedSsn = SSNEncryption.encryptSSN(ssn.toString());
+    userInfoAndPreferences['userData']['personalInfo']['ssn'] = encryptedSsn;
     try {
       // URL encode the text parameter to handle special characters
       // add lender data to colleciton
@@ -60,6 +64,51 @@ class FirebaseFunctions {
 }
 
 /*
+// Firebase service
+class UserService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> storeUserSSN(String ssn) async {
+    try {
+      final encryptedSSN = SSNEncryption.encryptSSN(ssn);
+      
+      await _firestore.collection('users').doc(userId).set({
+        'ssn': encryptedSSN,
+        'lastUpdated': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to store encrypted SSN: $e');
+    }
+  }
+
+  Future<String> retrieveUserSSN(String userId) async {
+    try {
+      final doc = await _firestore.collection('users').doc(userId).get();
+      if (!doc.exists || !doc.data()!.containsKey('ssn')) {
+        throw Exception('SSN not found');
+      }
+
+      final encryptedSSN = doc.data()!['ssn'] as String;
+      return SSNEncryption.decryptSSN(encryptedSSN);
+    } catch (e) {
+      throw Exception('Failed to retrieve SSN: $e');
+    }
+  }
+}
+
+// Usage example
+void main() async {
+  final userService = UserService();
+  
+  // Storing SSN
+  await userService.storeUserSSN('user123', '123-45-6789');
+  
+  // Retrieving SSN
+  final decryptedSSN = await userService.retrieveUserSSN('user123');
+  print('Decrypted SSN: $decryptedSSN');
+}
+
+/*
       if (currentUser == null) throw Exception('No user logged in');
       final url = Uri.parse('$baseUrl/addUserDetails');
       var body = jsonEncode({currentUser.uid: userInfoAndPreferences});
@@ -78,4 +127,5 @@ class FirebaseFunctions {
     }
   }
 }
+*/
 */

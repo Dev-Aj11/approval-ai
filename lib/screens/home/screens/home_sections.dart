@@ -6,6 +6,7 @@ import 'package:approval_ai/widgets/table_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
+import 'package:approval_ai/screens/home/controller/home_controller.dart';
 
 class HomeScreenSections {
   static Widget buildWelcomeHeader(String firstName) {
@@ -41,7 +42,7 @@ class HomeScreenSections {
   }
 
   static Widget buildOverviewStats(
-      Map<LenderStatusEnum, int> lenderStatusCount) {
+      Map<LenderStatusEnum, int> lenderStatusCount, HomeController controller) {
     return Container(
       width: 1100,
       child: Column(
@@ -68,6 +69,7 @@ class HomeScreenSections {
                     metricData:
                         lenderStatusCount[metricName]!.toString(), // 4, 3, 2, 1
                     metricType: metricName,
+                    controller: controller,
                   );
                 },
               ),
@@ -96,7 +98,9 @@ class HomeScreenSections {
         ...lenderData.map(
           (lenderData) => Padding(
             padding: const EdgeInsets.only(bottom: 32),
-            child: LenderCardScreen(lenderData: lenderData),
+            child: LenderCardScreen(
+              lenderData: lenderData,
+            ),
           ),
         ),
       ],

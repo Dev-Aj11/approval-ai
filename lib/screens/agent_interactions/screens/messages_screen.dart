@@ -56,8 +56,7 @@ class MessagesScreen extends StatelessWidget {
         children: [
           Text(
             "${loanOfficer} at ${lender}",
-            style: GoogleFonts.playfairDisplay(
-                fontSize: 18, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           IconButton(
             onPressed: () => Navigator.pop(context),

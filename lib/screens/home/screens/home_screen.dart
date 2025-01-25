@@ -7,6 +7,7 @@ import 'package:approval_ai/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 // TODO: this should pull from firebase
 class HomeScreen extends StatefulWidget {
@@ -19,7 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // Controller & State Management
   final HomeController _controller = HomeController();
   List<LenderData> _lenderDataItems = [];
-  String currentPage = "Home";
   bool _isLoading = true;
   String _firstName = "";
 
@@ -46,11 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       ButtonConfig(
         label: "Home",
-        onPress: () => setState(() => currentPage = "Home"),
+        onPress: () => _controller.setCurrentPage("Home"),
       ),
       ButtonConfig(
         label: "Messages",
-        onPress: () => setState(() => currentPage = "Messages"),
+        onPress: () => _controller.setCurrentPage("Messages"),
       ),
       ButtonConfig(
         label: "How it works",
@@ -71,39 +71,43 @@ class _HomeScreenState extends State<HomeScreen> {
     final recentLoanEstimates =
         _controller.getRecentLoanEstimatesForEachLender(_lenderDataItems);
 
-    return Container(
-      width: double.infinity,
-      alignment: Alignment.center,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Welcome Section
-          HomeScreenSections.buildWelcomeHeader(_firstName),
-          const SizedBox(height: 48),
+    return ChangeNotifierProvider(
+      create: (context) => _controller,
+      child: Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Welcome Section
+            HomeScreenSections.buildWelcomeHeader(_firstName),
+            const SizedBox(height: 48),
 
-          // Stats Section
-          HomeScreenSections.buildOverviewStats(_controller.lenderStatusCount),
-          const SizedBox(height: 48),
-
-          // Divider
-          _buildDivider(),
-          const SizedBox(height: 48),
-
-          // Leaderboard Section (conditional)
-          if (recentLoanEstimates.isNotEmpty) ...[
-            LeaderboardScreen(loanEstimates: recentLoanEstimates),
-            const SizedBox(height: 56),
-            _buildDivider(),
+            // Stats Section
+            HomeScreenSections.buildOverviewStats(
+                _controller.lenderStatusCount, _controller),
+            const SizedBox(height: 48),
 
             // Divider
+            _buildDivider(),
             const SizedBox(height: 48),
-          ],
 
-          // Lender Interactions
-          HomeScreenSections.buildLenderInteractions(
-              _isLoading, _lenderDataItems),
-          const SizedBox(height: 8),
-        ],
+            // Leaderboard Section (conditional)
+            if (recentLoanEstimates.isNotEmpty) ...[
+              LeaderboardScreen(loanEstimates: recentLoanEstimates),
+              const SizedBox(height: 56),
+              _buildDivider(),
+
+              // Divider
+              const SizedBox(height: 48),
+            ],
+
+            // Lender Interactions
+            HomeScreenSections.buildLenderInteractions(
+                _isLoading, _lenderDataItems),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
@@ -156,37 +160,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = MediaQuery.of(context).size.width < 768;
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final bool isMobile = MediaQuery.of(context).size.width < 768;
 
-    return Scaffold(
-      appBar: CustomAppBar(
-        buttons: isMobile ? [] : _buildAppBarButtons(),
-        leading: isMobile
-            ? IconButton(
-                icon: Icon(Icons.menu),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              )
-            : null,
-      ),
-      drawer: isMobile ? _buildDrawer() : null,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // get parent widget's width
-          final width = constraints.maxWidth;
-          return SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: width * 0.10,
-                vertical: 40,
-              ),
-              // child: Text("Hello"),
-              child: (currentPage == "Home")
-                  ? _buildDashboard()
-                  : _buildInteractions(), // change this to
-            ),
-          );
-        },
-      ),
+        return Scaffold(
+          appBar: CustomAppBar(
+            buttons: isMobile ? [] : _buildAppBarButtons(),
+            leading: isMobile
+                ? IconButton(
+                    icon: Icon(Icons.menu),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  )
+                : null,
+          ),
+          drawer: isMobile ? _buildDrawer() : null,
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.10,
+                    vertical: 40,
+                  ),
+                  child: (_controller.currentPage == "Home")
+                      ? _buildDashboard()
+                      : _buildInteractions(),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:approval_ai/screens/agent_interactions/screens/messages_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/forgot_pwd_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/login_screen.dart';
 import 'package:approval_ai/screens/authentication/screens/reset_successful_screen.dart';
@@ -52,7 +53,9 @@ class NavigationController {
         if (isAuthenticated && isEmailVerified) {
           // stop user from trying to access a public route or an undefined route
           if (!isDefinedRoute || isPublicRoute) {
-            return (isOnboardingComplete) ? '/home' : '/zerostatehome';
+            if (!isOnboardingComplete) {
+              return '/zerostatehome';
+            }
           }
           // stop user from accessing /home page if user has not completed onboarding
           if (!isOnboardingComplete && state.matchedLocation == '/home') {

@@ -1,3 +1,4 @@
+import 'package:approval_ai/screens/home/controller/home_controller.dart';
 import 'package:approval_ai/screens/home/model/estimate_data.dart';
 import 'package:approval_ai/screens/home/model/lender_data.dart';
 import 'package:approval_ai/screens/home/widgets/custom_headings.dart';
