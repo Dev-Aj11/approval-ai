@@ -205,34 +205,6 @@ class MobileLeaderboard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 32),
-          Container(
-            width: 120,
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              style: TableHelper.getButtonStyle(),
-              onPressed: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text("Get connected",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.black)),
-                  const SizedBox(width: 1),
-                  Transform.translate(
-                    offset: const Offset(0, 3),
-                    child: const Icon(
-                      Icons.chevron_right,
-                      size: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );

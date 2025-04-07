@@ -75,21 +75,34 @@ class LenderStatusBadge extends StatelessWidget {
     super.key,
   });
 
+  _getCurrentLenderStatus() {
+    if (type.contains(LenderStatusEnum.complete)) {
+      return LenderStatusEnum.complete;
+    } else if (type.contains(LenderStatusEnum.negotiating)) {
+      return LenderStatusEnum.negotiating;
+    } else if (type.contains(LenderStatusEnum.received)) {
+      return LenderStatusEnum.received;
+    } else {
+      return LenderStatusEnum.contacted;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final style = kMetricStyles[type.first]!;
+    final status = _getCurrentLenderStatus();
+    final metricStyle = kMetricStyles[status]!;
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: style.backgroundColor,
+        color: metricStyle.backgroundColor,
         // border: Border.all(color: style.foregroundColor),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        "Lenders Contacted",
+        metricStyle.lenderLabel,
         textAlign: TextAlign.center,
         style: GoogleFonts.inter(
-            color: style.foregroundColor,
+            color: metricStyle.foregroundColor,
             fontSize: 14,
             fontWeight: FontWeight.w400),
       ),

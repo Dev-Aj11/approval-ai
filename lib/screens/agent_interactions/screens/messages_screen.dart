@@ -115,6 +115,7 @@ class MessagesScreen extends StatelessWidget {
 
   Widget _buildMessageContent(
       BuildContext context, MessageData message, bool isAIAgent) {
+    final content = message.content.replaceAll("\\n", "\n");
     return Container(
       width: max(MediaQuery.of(context).size.width * 0.35, 300),
       decoration: BoxDecoration(
@@ -123,7 +124,7 @@ class MessagesScreen extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       child: Text(
-        message.content,
+        content,
         style: const TextStyle(fontSize: 14, color: Colors.black),
       ),
     );

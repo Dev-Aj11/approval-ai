@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Approval AI ',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
